@@ -1,11 +1,14 @@
-#pragma once
+#ifndef YTWINDOW_HPP
+#define YTWINDOW_HPP
+
+#define EXPORT_DLL __declspec(dllexport)
 
 #include "basic.hpp"
 #include <SDL2/SDL.h>
-#include <glad/glad.h>
+#include <glad.h>
 #include <memory>
 
-class YTWindow final {
+class EXPORT_DLL YTWindow final {
 public:
   static void InitWindow();
   static void QuitWindow();
@@ -22,3 +25,5 @@ private:
   static std::unique_ptr<YTWindow> _instance;
   static Vector2D<int> _windowSize;
 };
+
+#endif // YTWINDOW_HPP

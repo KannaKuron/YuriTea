@@ -1,5 +1,10 @@
 build/*
-.vs/*
+YuriTea_src/build/*
+
 .cache/*
+YuriTea_scr/.cache/*
+
 CMakeUserPresets.json
 CMakePresets.json
+
+.vs/*
