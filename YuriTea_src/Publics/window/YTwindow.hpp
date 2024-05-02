@@ -3,10 +3,11 @@
 
 #define EXPORT_DLL __declspec(dllexport)
 
-#include "basic.hpp"
+#include "basic/basic.hpp"
 #include <SDL2/SDL.h>
-#include <glad.h>
+#include <glad/glad.h>
 #include <memory>
+#include <rttr/registration_friend.h>
 
 class EXPORT_DLL YTWindow final {
 public:

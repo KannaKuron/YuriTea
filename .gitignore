@@ -4,6 +4,9 @@ YuriTea_src/build/*
 .cache/*
 YuriTea_scr/.cache/*
 
+YuriTeaDLL/*
+YuriTea_src/YuriTeaDLL/*
+
 CMakeUserPresets.json
 CMakePresets.json
 

@@ -8,7 +8,16 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_BUILD_TYPE Release)
 
 # 使用 vcpkg 的工具链文件
-set(CMAKE_TOOLCHAIN_FILE "C:/vcpkg/scripts/buildsystems/vcpkg.cmake")
+if(DEFINED ENV{VCPKG_TOOLCHAIN_FILE})
+    set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_TOOLCHAIN_FILE}")
+elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+    set(CMAKE_TOOLCHAIN_FILE "C:/vcpkg/scripts/buildsystems/vcpkg.cmake")
+else()
+    # 对于非Windows系统，可以选择不设置CMAKE_TOOLCHAIN_FILE
+    # 或者设置为默认的工具链文件路径，这里选择不设置
+    # 如果需要为其他系统指定默认路径，可以取消注释下面的行
+    # set(CMAKE_TOOLCHAIN_FILE "/path/to/default/toolchain/file")
+endif()
 
 # 定义项目名称和语言
 project(YuriTea LANGUAGES CXX)
@@ -19,86 +28,68 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 
 # 寻找所需的包
-find_package(SDL2 REQUIRED)
-find_package(SDL2_image REQUIRED)
-find_package(rttr CONFIG REQUIRED)
+find_package(SDL2 CONFIG REQUIRED)
+find_package(SDL2_image CONFIG REQUIRED)
+find_package(RTTR CONFIG REQUIRED) 
 
 # 定义所有代码文件夹
 set(INCLUDE_DIRS
-  tool
-  glad
-  window
-  basic
+  Publics
+)
+set(SRC_DIRS
+  Privates
 )
 
 # 递归添加所有源文件和头文件
 file(GLOB_RECURSE SRC_FILES
-  ./glad/glad.c
-
-  ./tool/*.cpp
-  ./window/*.cpp
-  ./basic/*.cpp
+  ${SRC_DIRS}/*.cpp
+  ${SRC_DIRS}/*.c
 
 )
 file(GLOB_RECURSE HEADER_FILES
-  ./glad/glad.h
-  
-  ./window/*.hpp
-  ./basic/*.hpp
-  ./tool/*.hpp
-  
+  ${INCLUDE_DIRS}/*.hpp
+  ${INCLUDE_DIRS}/*.h
 )
 
-# 指定dll输出目录
-# set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ./YuriTeaDLL/lib) 
-
-# 指定可执行文件输出目录
-# set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/YuriTeaDLL) 
-
-# 指定静态库输出目录
-# set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ./YuriTeaDLL/lib) 
 
 # 设置安装目录
-set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR})
+set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/YuriTeaDLL)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${CMAKE_SOURCE_DIR}/YuriTeaDLL/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/YuriTeaDLL/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_SOURCE_DIR}/YuriTeaDLL/lib)
 
 # 创建 YuriTea 库
 add_library(YuriTea SHARED ${SRC_FILES})
 #add_library(YuriTea STATIC ${SRC_FILES})
 
-install(TARGETS YuriTea
-        # RUNTIME DESTINATION ${CMAKE_SOURCE_DIR}/YuriTeaDLL/bin
-
-        LIBRARY DESTINATION ${CMAKE_SOURCE_DIR}/YuriTeaDLL/lib
-
-        ARCHIVE DESTINATION ${CMAKE_SOURCE_DIR}/YuriTeaDLL/lib
-)
-
-# 安装头文件到 include 目录，保持原始文件夹结构
-install(DIRECTORY ${INCLUDE_DIRS} DESTINATION ${CMAKE_SOURCE_DIR}/YuriTeaDLL/include
-         FILES_MATCHING           # 仅匹配文件
-        PATTERN "*.hpp"          # 匹配以 .hpp 结尾的文件
-        PATTERN "*.h"            # 匹配以 .h 结尾的文件
-        PATTERN "*.cpp" EXCLUDE  # 排除以 .cpp 结尾的文件
-        PATTERN "*.c" EXCLUDE   # 排除以 .c 结尾的文件
-)
-
 # 设置库属性
 set_target_properties(YuriTea PROPERTIES
   LINKER_LANGUAGE CXX
   # RUNTIME_OUTPUT_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
-  LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/YuriTeaDLL/lib
-  ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/YuriTeaDLL/lib
+  LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib
+  ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib
   OUTPUT_NAME "YuriTea"
   PREFIX "" # 去除生成的 dll 文件名前缀
 )
 
-# 添加头文件路径
-target_include_directories(YuriTea PUBLIC
-  ${INCLUDE_DIRS}
-  ${SDL2_IMAGE_INCLUDE_DIRS}
-  ${SDL2_INCLUDE_DIRS}
+
+
+set(DEPENDENCIES_DIRS
+
+  ${SDL2_INCLUDE_DIR}
+
   ${RTTR_INCLUDE_DIR}
+
 )
+
+
+
+# 添加头文件路径
+target_include_directories(YuriTea PRIVATE
+  ${INCLUDE_DIRS}
+  ${DEPENDENCIES_DIRS}
+)
+
 
 # 链接库
 target_link_libraries(YuriTea PRIVATE
@@ -106,5 +97,35 @@ target_link_libraries(YuriTea PRIVATE
   SDL2::SDL2main
   SDL2_image::SDL2_image
   RTTR::Core
+)
+
+#====================================================================================================
+
+
+
+#install sdl2 and sdl2_image and rttr 的头文件
+install(DIRECTORY 
+  ${DEPENDENCIES_DIRS}
+  DESTINATION ${CMAKE_SOURCE_DIR}/YuriTeaDLL/Publics
+)
+
+
+# 安装 YuriTea 库
+install(TARGETS YuriTea
+
+        RUNTIME DESTINATION ${CMAKE_SOURCE_DIR}/YuriTeaDLL/lib
+
+        LIBRARY DESTINATION ${CMAKE_SOURCE_DIR}/YuriTeaDLL/lib
+
+        ARCHIVE DESTINATION ${CMAKE_SOURCE_DIR}/YuriTeaDLL/lib
+
+)
+
+
+# 安装头文件到 include 目录，保持原始文件夹结构
+install(DIRECTORY 
+  ${INCLUDE_DIRS}
+
+  DESTINATION ${CMAKE_SOURCE_DIR}/YuriTeaDLL
 )
 

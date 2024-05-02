@@ -1,6 +1,6 @@
-#include "basicStructs.hpp"
-#include <YTwindow.hpp>
 #include <memory>
+#include <window/YTwindow.hpp>
+
 
 std::unique_ptr<YTWindow> YTWindow::_instance = nullptr;
 Vector2D<int> YTWindow::_windowSize = {1000, 800};

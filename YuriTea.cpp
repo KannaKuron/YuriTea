@@ -1,8 +1,9 @@
 #include <iostream>
+// #include <window/YTwindow.hpp>
 
-int main(int argc, char **argv) {
+int main() {
 
-  std::cout << "Hello, World!" << std::endl;
+  std::cout << "Hello, YuriTea!";
 
   return 0;
 }
