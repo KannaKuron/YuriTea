@@ -1,7 +1,12 @@
-#ifndef YTWINDOW_HPP
-#define YTWINDOW_HPP
+#pragma once
 
-#define EXPORT_DLL __declspec(dllexport)
+#ifdef _WIN32
+#ifdef YuriTea_DLL
+#define YuriTea_DLL_API __declspec(dllexport)
+#else
+#define YuriTea_DLL_API __declspec(dllimport)
+#endif
+#endif
 
 #include "basic/basic.hpp"
 #include <SDL2/SDL.h>
@@ -9,7 +14,7 @@
 #include <memory>
 #include <rttr/registration_friend.h>
 
-class EXPORT_DLL YTWindow final {
+class YuriTea_DLL_API YTWindow final {
 public:
   static void InitWindow();
   static void QuitWindow();
@@ -26,5 +31,3 @@ private:
   static std::unique_ptr<YTWindow> _instance;
   static Vector2D<int> _windowSize;
 };
-
-#endif // YTWINDOW_HPP

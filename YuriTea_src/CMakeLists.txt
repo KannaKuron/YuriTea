@@ -4,6 +4,10 @@ cmake_minimum_required(VERSION 3.20)
 # 导出编译命令
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# 设置 C++ 标准
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 # 设置构建类型
 set(CMAKE_BUILD_TYPE Release)
 
@@ -22,9 +26,10 @@ endif()
 # 定义项目名称和语言
 project(YuriTea LANGUAGES CXX)
 
-# 设置 C++ 标准
-set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(CMAKE_C_COMPILER "C:/Program Files/LLVM/bin/clang.exe")
+set(CMAKE_CXX_COMPILER "C:/Program Files/LLVM/bin/clang++.exe")
+
 
 
 # 寻找所需的包
@@ -62,6 +67,11 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_SOURCE_DIR}/YuriTeaDLL
 add_library(YuriTea SHARED ${SRC_FILES})
 #add_library(YuriTea STATIC ${SRC_FILES})
 
+
+#设定宏定义
+target_compile_definitions(YuriTea PRIVATE YuriTea_DLL)
+
+
 # 设置库属性
 set_target_properties(YuriTea PROPERTIES
   LINKER_LANGUAGE CXX
@@ -85,14 +95,16 @@ set(DEPENDENCIES_DIRS
 
 
 # 添加头文件路径
-target_include_directories(YuriTea PRIVATE
+target_include_directories(${PROJECT_NAME} PRIVATE
+  
   ${INCLUDE_DIRS}
   ${DEPENDENCIES_DIRS}
 )
 
 
 # 链接库
-target_link_libraries(YuriTea PRIVATE
+target_link_libraries(${PROJECT_NAME} PRIVATE
+  
   SDL2::SDL2
   SDL2::SDL2main
   SDL2_image::SDL2_image
@@ -109,9 +121,17 @@ install(DIRECTORY
   DESTINATION ${CMAKE_SOURCE_DIR}/YuriTeaDLL/Publics
 )
 
+# 安装头文件到 include 目录，保持原始文件夹结构
+install(DIRECTORY 
+
+  ${INCLUDE_DIRS}
+
+  DESTINATION ${CMAKE_SOURCE_DIR}/YuriTeaDLL
+)
 
 # 安装 YuriTea 库
-install(TARGETS YuriTea
+install(TARGETS ${PROJECT_NAME}
+        
 
         RUNTIME DESTINATION ${CMAKE_SOURCE_DIR}/YuriTeaDLL/lib
 
@@ -122,10 +142,4 @@ install(TARGETS YuriTea
 )
 
 
-# 安装头文件到 include 目录，保持原始文件夹结构
-install(DIRECTORY 
-  ${INCLUDE_DIRS}
-
-  DESTINATION ${CMAKE_SOURCE_DIR}/YuriTeaDLL
-)
 

@@ -1,5 +1,5 @@
+#include "window/window.hpp"
 #include <memory>
-#include <window/YTwindow.hpp>
 
 
 std::unique_ptr<YTWindow> YTWindow::_instance = nullptr;

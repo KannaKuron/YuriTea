@@ -2,36 +2,51 @@
 cmake_minimum_required(VERSION 3.20)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# 设置 C++ 标准
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+
 if(DEFINED ENV{VCPKG_TOOLCHAIN_FILE})
     set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_TOOLCHAIN_FILE}")
 elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
     set(CMAKE_TOOLCHAIN_FILE "C:/vcpkg/scripts/buildsystems/vcpkg.cmake")
 else()
-    # 对于非Windows系统，可以选择不设置CMAKE_TOOLCHAIN_FILE
-    # 或者设置为默认的工具链文件路径，这里选择不设置
-    # 如果需要为其他系统指定默认路径，可以取消注释下面的行
-    # set(CMAKE_TOOLCHAIN_FILE "/path/to/default/toolchain/file")
 endif()
 
 project(YuriTeaTest LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(CMAKE_C_COMPILER "C:/Program Files/LLVM/bin/clang.exe")
+set(CMAKE_CXX_COMPILER "C:/Program Files/LLVM/bin/clang++.exe")
+
 
 set(CMAKE_BUILD_TYPE Debug)
 
-ADD_SUBDIRECTORY(YuriTea_src)
+set(DLL_DIR ${CMAKE_SOURCE_DIR}/YuriTeaDLL/lib)
 
+
+add_subdirectory(YuriTea_src)
 
 add_executable(${PROJECT_NAME}
-  YuriTea.cpp
+  ./YuriTea.cpp
 )
+
 
 # 添加头文件目录
 target_include_directories(${PROJECT_NAME} PRIVATE YuriTeaDLL/Publics)
 
+message("Begin to link YuriTea.dll ...")
 
+# 如果需要，复制DLL到可执行文件的输出目录
+add_custom_command(TARGET YuriTeaTest POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "${DLL_DIR}/YuriTea.dll"
+    $<TARGET_FILE_DIR:YuriTeaTest>
+)
+message("Copy YuriTea.dll to output directory.")
 
+# 链接动态导入库
+link_directories(${DLL_DIR})
+target_link_libraries(${PROJECT_NAME} YuriTea)
 
-# 添加对 YuriTea DLL 的链接
-#target_link_libraries(${PROJECT_NAME} PRIVATE ./YuriTeaDLL/lib/YuriTea)
