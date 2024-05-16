@@ -36,8 +36,9 @@ set(CMAKE_CXX_COMPILER "C:/Program Files/LLVM/bin/clang++.exe")
 find_package(SDL2 CONFIG REQUIRED)
 find_package(SDL2_image CONFIG REQUIRED)
 find_package(RTTR CONFIG REQUIRED) 
+find_package(FMT CONFIG REQUIRED)
+find_package(spdlog CONFIG REQUIRED)
 
-# 定义所有代码文件夹
 set(INCLUDE_DIRS
   Publics
 )
@@ -51,6 +52,7 @@ file(GLOB_RECURSE SRC_FILES
   ${SRC_DIRS}/*.c
 
 )
+
 file(GLOB_RECURSE HEADER_FILES
   ${INCLUDE_DIRS}/*.hpp
   ${INCLUDE_DIRS}/*.h
@@ -65,7 +67,6 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_SOURCE_DIR}/YuriTeaDLL
 
 # 创建 YuriTea 库
 add_library(YuriTea SHARED ${SRC_FILES})
-#add_library(YuriTea STATIC ${SRC_FILES})
 
 
 #设定宏定义
@@ -90,7 +91,12 @@ set(DEPENDENCIES_DIRS
 
   ${RTTR_INCLUDE_DIR}
 
+  ${FMT_INCLUDE_DIR}
+
+  ${SPDLOG_INCLUDE_DIR}
+
 )
+
 
 
 
@@ -109,6 +115,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   SDL2::SDL2main
   SDL2_image::SDL2_image
   RTTR::Core
+  spdlog::spdlog_header_only
 )
 
 #====================================================================================================

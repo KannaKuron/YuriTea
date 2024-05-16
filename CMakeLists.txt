@@ -29,7 +29,7 @@ set(DLL_DIR ${CMAKE_SOURCE_DIR}/YuriTeaDLL/lib)
 add_subdirectory(YuriTea_src)
 
 add_executable(${PROJECT_NAME}
-  ./YuriTea.cpp
+  ./SandBox.cpp
 )
 
 
