@@ -1,8 +1,8 @@
 build/*
 YuriTea_src/build/*
 
-.cache
-YuriTea_scr/.cache
+.cache/*
+YuriTea_src/.cache/*
 
 YuriTeaDLL/*
 YuriTea_src/YuriTeaDLL/*
