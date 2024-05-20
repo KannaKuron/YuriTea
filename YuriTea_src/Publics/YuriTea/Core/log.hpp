@@ -26,6 +26,7 @@ private:
 
 } // namespace YuriTea
 
+#ifdef YuriTea_DEBUG
 #define YT_CORE_TRACE(...) ::YuriTea::Log::GetCoreLogger()->trace(__VA_ARGS__)
 #define YT_CORE_INFO(...) ::YuriTea::Log::GetCoreLogger()->info(__VA_ARGS__)
 #define YT_CORE_WARN(...) ::YuriTea::Log::GetCoreLogger()->warn(__VA_ARGS__)
@@ -35,3 +36,13 @@ private:
 #define YT_INFO(...) ::YuriTea::Log::GetClientLogger()->info(__VA_ARGS__)
 #define YT_WARN(...) ::YuriTea::Log::GetClientLogger()->warn(__VA_ARGS__)
 #define YT_ERROR(...) ::YuriTea::Log::GetClientLogger()->error(__VA_ARGS__)
+#else
+#define YT_CORE_TRACE(...)
+#define YT_CORE_INFO(...)
+#define YT_CORE_WARN(...)
+#define YT_CORE_ERROR(...)
+#define YT_TRACE(...)
+#define YT_INFO(...)
+#define YT_WARN(...)
+#define YT_ERROR(...)
+#endif

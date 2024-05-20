@@ -4,5 +4,5 @@
 #include "YuriTea/Core/core.hpp"
 
 // ===================Entry Point======================
-#include "YuriTea/Core/EntryPoint.hpp"
+#include "YuriTea/Core/entryPoint.hpp"
 // ====================================================
