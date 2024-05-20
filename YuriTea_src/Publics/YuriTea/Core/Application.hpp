@@ -1,5 +1,5 @@
 #pragma once
-#include "YuriTea/Core/Core.hpp"
+#include "YuriTea/Core/core.hpp"
 #include <spdlog/spdlog.h>
 
 namespace YuriTea {

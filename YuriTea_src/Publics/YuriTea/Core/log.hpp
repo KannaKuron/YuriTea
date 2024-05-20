@@ -1,5 +1,5 @@
 #pragma once
-#include "YuriTea/Core/Core.hpp"
+#include "YuriTea/Core/core.hpp"
 #include "spdlog/spdlog.h"
 #include <memory>
 
@@ -30,10 +30,8 @@ private:
 #define YT_CORE_INFO(...) ::YuriTea::Log::GetCoreLogger()->info(__VA_ARGS__)
 #define YT_CORE_WARN(...) ::YuriTea::Log::GetCoreLogger()->warn(__VA_ARGS__)
 #define YT_CORE_ERROR(...) ::YuriTea::Log::GetCoreLogger()->error(__VA_ARGS__)
-#define YT_CORE_FATAL(...) ::YuriTea::Log::GetCoreLogger()->fatal(__VA_ARGS__)
 
 #define YT_TRACE(...) ::YuriTea::Log::GetClientLogger()->trace(__VA_ARGS__)
 #define YT_INFO(...) ::YuriTea::Log::GetClientLogger()->info(__VA_ARGS__)
 #define YT_WARN(...) ::YuriTea::Log::GetClientLogger()->warn(__VA_ARGS__)
 #define YT_ERROR(...) ::YuriTea::Log::GetClientLogger()->error(__VA_ARGS__)
-#define YT_FATAL(...) ::YuriTea::Log::GetClientLogger()->fatal(__VA_ARGS__)

@@ -70,9 +70,14 @@ add_library(YuriTea SHARED ${SRC_FILES})
 
 
 #设定宏定义
+target_compile_definitions(YuriTea PRIVATE YuriTea_DEBUG)
+target_compile_definitions(YuriTea PRIVATE YuriTea_ENABLE_ASSERTS)
 target_compile_definitions(YuriTea PRIVATE YuriTea_DLL)
+target_compile_definitions(YuriTea PRIVATE YuriTea_Platform_Windows)
 
 
+# 设置PCH
+target_precompile_headers(${PROJECT_NAME} PRIVATE  ${CMAKE_CURRENT_SOURCE_DIR}/Publics/YuriTea/Core/core.hpp)
 # 设置库属性
 set_target_properties(YuriTea PROPERTIES
   LINKER_LANGUAGE CXX

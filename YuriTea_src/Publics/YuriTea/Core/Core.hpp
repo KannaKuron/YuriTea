@@ -1,10 +1,24 @@
 #pragma once
 
-#ifdef YuriTea_DLL
+#include <algorithm>
+#include <functional>
+#include <iostream>
+#include <memory>
+#include <utility>
 
-#define YURITEA_API __declspec(dllexport)
-#else
-#define YURITEA_API __declspec(dllimport)
+
+#include <array>
+#include <sstream>
+#include <string>
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
+
+
+#include "YuriTea/Core/base.hpp"
+
+#include "YuriTea/Core/log.hpp"
+
+#ifdef YuriTea_Platform_Windows
+#include <Windows.h>
 #endif
-
-#define BIT(x) (1 << x) // Bitwise shift operator
