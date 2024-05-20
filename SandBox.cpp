@@ -1,4 +1,6 @@
-#include <YuriTea.hpp>
+
+
+#include <YuriTea/Core/YuriTea.hpp>
 #include <iostream>
 
 #ifdef _WIN32

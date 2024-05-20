@@ -47,7 +47,6 @@ private:
 
 private:
   SDL_Window *m_Window; // SDL窗口
-  SDL_GLContext m_Context; // OpenGL上下文
   WindowData m_Data;
 };
 

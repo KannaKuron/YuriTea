@@ -32,11 +32,13 @@ add_executable(${PROJECT_NAME}
   ./SandBox.cpp
 )
 
+target_compile_definitions(YuriTeaTest PRIVATE YuriTea_DEBUG)
+target_compile_definitions(YuriTeaTest PRIVATE YuriTea_ENABLE_ASSERTS)
+target_compile_definitions(YuriTeaTest PRIVATE YuriTea_Platform_Windows)
 
 # 添加头文件目录
 target_include_directories(${PROJECT_NAME} PRIVATE YuriTeaDLL/Publics)
 
-message("Begin to link YuriTea.dll ...")
 
 # 如果需要，复制DLL到可执行文件的输出目录
 add_custom_command(TARGET YuriTeaTest POST_BUILD
@@ -45,6 +47,12 @@ add_custom_command(TARGET YuriTeaTest POST_BUILD
     $<TARGET_FILE_DIR:YuriTeaTest>
 )
 message("Copy YuriTea.dll to output directory.")
+# 拷贝sdl2.dll
+add_custom_command(TARGET YuriTeaTest POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "${DLL_DIR}/SDL2.dll"
+    $<TARGET_FILE_DIR:YuriTeaTest>
+)
 
 # 链接动态导入库
 link_directories(${DLL_DIR})

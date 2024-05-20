@@ -5,6 +5,8 @@ namespace YuriTea {
 
 Application::Application() {
   // 构造函数实现
+  WindowProps props;
+  m_Window = Window::Create(props);
 }
 
 Application::~Application() {
@@ -12,11 +14,12 @@ Application::~Application() {
 }
 
 void Application::Run() {
-  while (true) {
+  YT_INFO("Application Running");
+  while (m_Running) {
     // 一直循环
-    YT_INFO("Application Running");
-    YT_ERROR("Application Running Error");
+    m_Window->OnUpdate();
   }
 }
 
+Application *CreateApplication() { return new Application(); }
 } // namespace YuriTea

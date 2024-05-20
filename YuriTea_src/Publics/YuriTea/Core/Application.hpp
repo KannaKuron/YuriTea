@@ -1,5 +1,5 @@
 #pragma once
-#include "YuriTea/Core/core.hpp"
+#include "YuriTea/Core/window.hpp"
 #include <spdlog/spdlog.h>
 
 namespace YuriTea {
@@ -10,6 +10,10 @@ public:
   virtual ~Application(); // 析构函数
 
   void Run();
+
+private:
+  Scope<Window> m_Window;
+  bool m_Running = true;
 };
 
 // To be defined in CLIENT
