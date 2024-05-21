@@ -6,30 +6,39 @@
 namespace YuriTea {
 
 enum class EventType : uint16 {
-  None = 0,
-  WindowClose,
-  WindowResize,
-  WindowFocus,
-  WindowLostFocus,
-  WindowMoved,
+  None = 0, // 0
+  WindowClose, // ok
+  WindowResize, // ok
+  WindowFocus, // ok
+  WindowLostFocus, // ok
+  WindowMoved, // ok
+  WindowMinimized,  // ok
+  WindowMaximized,  // ok
+  WindowShown,  // ok
+  WindowHidden,  // ok
+  WindowEnter,  // ok
+  WindowLeave,   // ok
+  WindowExposed, // ok
+  WindowRestored, // ok
+  APPTERMINATE,  // ok
   AppTick,
   AppUpdate,
   AppRender,
-  KeyPressed,
-  KeyReleased,
-  MouseButtonPressed,
-  MouseButtonReleased,
-  MouseMoved,
-  MouseScrolled
+  KeyPressed, // ok
+  KeyReleased, // ok
+  MouseButtonPressed, // ok
+  MouseButtonReleased, // ok
+  MouseMoved, // ok
+  MouseScrolled // ok
 };
 
 enum EventCategory : uint8 {
-  None = 0,
-  EventCategoryApplication = BIT(0), // BIT(0) = 00000001
-  EventCategoryInput = BIT(1),       // BIT(1) = 00000010
-  EventCategoryKeyboard = BIT(2),    // BIT(2) = 00000100
-  EventCategoryMouse = BIT(3),       // BIT(3) = 00001000
-  EventCategoryMouseButton = BIT(4)  // BIT(4) = 00010000
+  None = 0, // 00000000 None event
+  EventCategoryApplication = BIT(0), // BIT(0) = 00000001 应用事件
+  EventCategoryInput = BIT(1),       // BIT(1) = 00000010 输入事件
+  EventCategoryKeyboard = BIT(2),    // BIT(2) = 00000100 键盘事件
+  EventCategoryMouse = BIT(3),       // BIT(3) = 00001000 鼠标事件
+  EventCategoryMouseButton = BIT(4)  // BIT(4) = 00010000 鼠标按键事件
 };
 
 #define EVENT_CLASS_TYPE(type)                                                 \

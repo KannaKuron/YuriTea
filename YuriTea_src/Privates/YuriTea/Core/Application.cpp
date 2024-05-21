@@ -17,6 +17,9 @@ Application::Application() {
 void Application::OnEvent(Event &e) {
   // 事件处理函数实现
   YT_CORE_INFO("Application Call Back OnEvent ,the Event :{0}",e.ToString());
+  if (e.GetEventType() == EventType::WindowClose) {
+    m_Running = false;
+  }
 
 
 }
@@ -36,8 +39,10 @@ void Application::Run() {
     glClear(GL_COLOR_BUFFER_BIT);
     SDL_GL_SwapWindow(window);
     m_Window->OnUpdate();
+    SDL_PumpEvents(); // 更新事件
   }
 }
+
 
 Application *CreateApplication() { return new Application(); }
 } // namespace YuriTea

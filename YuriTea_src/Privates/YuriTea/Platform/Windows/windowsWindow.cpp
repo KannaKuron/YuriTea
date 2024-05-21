@@ -1,9 +1,13 @@
 #include "YuriTea/Platform/Windows/windowsWindow.hpp"
+#include "YuriTea/Core/base.hpp"
 #include "YuriTea/Core/basicstruct.hpp"
+#include "YuriTea/Core/keyCodes.hpp"
+#include "YuriTea/Core/log.hpp"
 #include "YuriTea/Events/applicationEvent.hpp"
 #include "YuriTea/Events/keyEvent.hpp"
 #include "YuriTea/Events/mouseEvent.hpp"
 #include <SDL_events.h>
+#include <SDL_video.h>
 
 namespace YuriTea {
 
@@ -24,6 +28,11 @@ void WindowsWindow::SetEventFilters(){
         callBack(e);
         return 0;
       }
+      case SDL_APP_TERMINATING :{
+        AppTerminateEvent e;
+        callBack(e);
+        return 0;
+      }
       case SDL_KEYDOWN :{
         //  KeyPressedEvent(KeyCode code, KeyMod mod, uint32 repeatCount)
         KeyPressedEvent e(static_cast<KeyCode>(event->key.keysym.sym),
@@ -38,10 +47,57 @@ void WindowsWindow::SetEventFilters(){
         callBack(e);
         return 0;
       }
+      case SDL_MOUSEMOTION :{
+        //  MouseMovedEvent(Vector2<float32> position, Vector2<float32> lastPosition,uint32 timeStamp, uint32 state, uint32 keyMod)
+        // 这时候的键盘状态
+        auto mod = SDL_GetModState();
+        MouseMovedEvent e(event->motion.x, event->motion.y,
+                          event->motion.xrel, event->motion.yrel,
+                          event->motion.timestamp,
+                          event->motion.state,
+                          static_cast<KeyMod>(mod));
+        callBack(e);
+        return 0;
+      }
+      case SDL_MOUSEBUTTONDOWN :{
+        //  MouseButtonPressedEvent(MouseCode button, KeyMod modifiers, uint32 repeatCount, float32 x, float32 y, uint32 timeStamp)
+        auto mod = SDL_GetModState();
+        MouseButtonPressedEvent e(static_cast<MouseCode>(event->button.button),
+                            static_cast<KeyMod>(mod),
+                            event->button.clicks,
+                            static_cast<float32>(event->button.x), static_cast<float32>(event->button.y),
+                            event->button.timestamp);
+        callBack(e);
+        return 0;
+      }
+      case SDL_MOUSEBUTTONUP :{
+        //  MouseButtonReleasedEvent(MouseCode button, KeyMod modifiers, float32 x, float32 y, uint32 timeStamp)
+        auto mod = SDL_GetModState();
+        MouseButtonReleasedEvent e(static_cast<MouseCode>(event->button.button),
+                      static_cast<KeyMod>(mod),
+                      static_cast<float32>(event->button.x), static_cast<float32>(event->button.y),
+                      event->button.timestamp);
+        callBack(e);
+        return 0;
+      }
+      case SDL_MOUSEWHEEL :{
+        //MouseScrolledEvent(float32 positionX, float32 positionY, float32 offsetX, float32 offsetY, uint32 timeStamp, KeyMod modifiers)
+        auto mod = SDL_GetModState();
+        MouseScrolledEvent e(static_cast<float32>(event->wheel.mouseX),static_cast<float32>( event->wheel.mouseY),
+                            static_cast<float32>(event->wheel.x),static_cast<float32>(event->wheel.y),
+                            event->wheel.timestamp, static_cast<KeyMod>(mod));
+        callBack(e);
+        return 0;
+      }
       case SDL_WINDOWEVENT: {
         switch (event->window.event) {
           case SDL_WINDOWEVENT_RESIZED: {
             WindowResizeEvent e(Vector2<uint32>{static_cast<uint32>(event->window.data1), static_cast<uint32>(event->window.data2)});
+            callBack(e);
+            return 0;
+          }
+          case SDL_WINDOWEVENT_MOVED : {
+            WindowMovedEvent e(Vector2<uint32>{static_cast<uint32>(event->window.data1), static_cast<uint32>(event->window.data2)});
             callBack(e);
             return 0;
           }
@@ -55,10 +111,55 @@ void WindowsWindow::SetEventFilters(){
             callBack(e);
             return 0;
           }
-          
+          case SDL_WINDOWEVENT_CLOSE: {
+            WindowCloseEvent e;
+            callBack(e);
+            return 0;
+          }
+          case SDL_WINDOWEVENT_SHOWN: { 
+            WindowShowEvent e;
+            callBack(e);
+            return 0;
+          }
+          case SDL_WINDOWEVENT_HIDDEN: {
+            WindowHideEvent e;
+            callBack(e);
+            return 0;
+          }
+          case SDL_WINDOWEVENT_MAXIMIZED: {
+            WindowMaximizedEvent e;
+            callBack(e);
+            return 0;
+          }
+          case SDL_WINDOWEVENT_MINIMIZED: {
+            WindowMinimizedEvent e;
+            callBack(e);
+            return 0;
+          }
+          case SDL_WINDOWEVENT_ENTER: {
+            WindowEnterEvent e;
+            callBack(e);
+            return 0;
+          }
+          case SDL_WINDOWEVENT_LEAVE: {
+            WindowLeaveEvent e;
+            callBack(e);
+            return 0;
+          }
+          case SDL_WINDOWEVENT_EXPOSED: { // 窗口暴露 
+            WindowExposedEvent e;
+            callBack(e);
+            return 0;
+          }
+          case SDL_WINDOWEVENT_RESTORED: { // 窗口恢复
+            WindowRestoredEvent e;
+            callBack(e);
+            return 0;
+          }
           default: {
             UnKnownEvent e;
             callBack(e);
+            YT_CORE_WARN("未知窗口事件{0}", event->window.event);
             return 0;
           }
         }
@@ -66,6 +167,7 @@ void WindowsWindow::SetEventFilters(){
     }
     default: {
       UnKnownEvent e;
+      YT_CORE_WARN("未知事件{0}", event->type);
       callBack(e);
       return 0;
     }
