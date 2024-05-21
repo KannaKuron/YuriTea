@@ -14,6 +14,7 @@ class YURITEA_API WindowsWindow : public Window {
     bool Fullscreen; // 全屏
     bool CursorVisible; // 鼠标可见
     EventCallbackFn EventCallback; // 事件回调函数
+    
   };
 
 public:
@@ -44,9 +45,12 @@ public:
 private:
   void Init(const WindowProps &props);
   void Shutdown();
+  void SetEventFilters();
+  void SetEventWatchs();
 
 private:
   SDL_Window *m_Window; // SDL窗口
+  SDL_GLContext m_Context; // OpenGL上下文
   WindowData m_Data;
 };
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "YuriTea/Core/Application.hpp"
+#include "YuriTea/Core/application.hpp"
 #include "YuriTea/Core/core.hpp"
 
 // ===================Entry Point======================

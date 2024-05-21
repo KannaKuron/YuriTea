@@ -10,6 +10,7 @@ public:
   virtual ~Application(); // 析构函数
 
   void Run();
+  void OnEvent(Event &);
 
 private:
   Scope<Window> m_Window;

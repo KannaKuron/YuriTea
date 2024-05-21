@@ -14,7 +14,7 @@
 #include <unordered_set>
 #include <vector>
 
-
+#include "YuriTea/Core/basicstruct.hpp"
 #include "YuriTea/Core/base.hpp"
 
 #include "YuriTea/Core/log.hpp"

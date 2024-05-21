@@ -1,5 +1,6 @@
 #pragma once
 
+#include "YuriTea/Core/base.hpp"
 #include "YuriTea/Core/core.hpp"
 
 namespace YuriTea {
@@ -39,9 +40,32 @@ enum EventCategory : uint8 {
 #define EVENT_CLASS_CATEGORY(category)                                         \
   virtual uint32_t GetCategoryFlags() const override { return category; }
 
+
+
+// =========================================
+
+// the Event class is a base class for all events in the engine
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ============== Event Class ==============
 class YURITEA_API Event {
   friend class EventDispatcher; // 事件分发器
-
 public:
   virtual EventType GetEventType() const = 0;
   virtual uint32_t GetCategoryFlags() const = 0;
@@ -64,7 +88,21 @@ protected:
   bool m_Handled = false;
 };
 
-class EventDispatcher {
+
+class YURITEA_API UnKnownEvent : public Event {
+public:
+  UnKnownEvent() = default;
+  virtual ~UnKnownEvent() = default;
+  std::string ToString() const override { return "UnKnownEvent Can't Dispatch"; }
+
+  EVENT_CLASS_TYPE(EventType::None)
+  EVENT_CLASS_CATEGORY(EventCategory::None)
+};
+
+
+
+
+class YURITEA_API EventDispatcher {
   template <typename T> using EventFn = std::function<bool(T &)>;
 
 public:
@@ -81,6 +119,7 @@ public:
 private:
   Event &m_Event;
 };
+
 
 inline std::ostream &operator<<(std::ostream &os, const Event &e) {
   return os << e.ToString();
