@@ -1,13 +1,11 @@
 #include "YuriTea/Platform/Windows/windowsWindow.hpp"
-#include "YuriTea/Core/base.hpp"
-#include "YuriTea/Core/basicstruct.hpp"
+#include "YuriTea/Core/core.hpp"
 #include "YuriTea/Core/keyCodes.hpp"
 #include "YuriTea/Core/log.hpp"
 #include "YuriTea/Events/applicationEvent.hpp"
 #include "YuriTea/Events/keyEvent.hpp"
 #include "YuriTea/Events/mouseEvent.hpp"
-#include <SDL_events.h>
-#include <SDL_video.h>
+#include <SDL2/SDL_events.h>
 
 namespace YuriTea {
 
@@ -33,6 +31,8 @@ void WindowsWindow::SetEventFilters(){
         callBack(e);
         return 0;
       }
+
+      // * Keyboard Events * //
       case SDL_KEYDOWN :{
         //  KeyPressedEvent(KeyCode code, KeyMod mod, uint32 repeatCount)
         KeyPressedEvent e(static_cast<KeyCode>(event->key.keysym.sym),
@@ -47,6 +47,8 @@ void WindowsWindow::SetEventFilters(){
         callBack(e);
         return 0;
       }
+
+      // * Mouse Events * //
       case SDL_MOUSEMOTION :{
         //  MouseMovedEvent(Vector2<float32> position, Vector2<float32> lastPosition,uint32 timeStamp, uint32 state, uint32 keyMod)
         // 这时候的键盘状态
@@ -89,64 +91,66 @@ void WindowsWindow::SetEventFilters(){
         callBack(e);
         return 0;
       }
+
+      // * Window Events * //
       case SDL_WINDOWEVENT: {
         switch (event->window.event) {
-          case SDL_WINDOWEVENT_RESIZED: {
+          case SDL_WINDOWEVENT_RESIZED: { // 窗口大小改变
             WindowResizeEvent e(Vector2<uint32>{static_cast<uint32>(event->window.data1), static_cast<uint32>(event->window.data2)});
             callBack(e);
             return 0;
           }
-          case SDL_WINDOWEVENT_MOVED : {
+          case SDL_WINDOWEVENT_MOVED : { // 窗口移动
             WindowMovedEvent e(Vector2<uint32>{static_cast<uint32>(event->window.data1), static_cast<uint32>(event->window.data2)});
             callBack(e);
             return 0;
           }
-          case SDL_WINDOWEVENT_FOCUS_LOST: {
+          case SDL_WINDOWEVENT_FOCUS_LOST: { // 窗口失去焦点
             WindowFocusEvent e;
             callBack(e);
             return 0;
           }
-          case SDL_WINDOWEVENT_FOCUS_GAINED: {
+          case SDL_WINDOWEVENT_FOCUS_GAINED: { // 窗口获得焦点
             WindowLostFocusEvent e;
             callBack(e);
             return 0;
           }
-          case SDL_WINDOWEVENT_CLOSE: {
+          case SDL_WINDOWEVENT_CLOSE: { // 窗口关闭
             WindowCloseEvent e;
             callBack(e);
             return 0;
           }
-          case SDL_WINDOWEVENT_SHOWN: { 
+          case SDL_WINDOWEVENT_SHOWN: {  // 窗口显示
             WindowShowEvent e;
             callBack(e);
             return 0;
           }
-          case SDL_WINDOWEVENT_HIDDEN: {
+          case SDL_WINDOWEVENT_HIDDEN: { // 窗口隐藏
             WindowHideEvent e;
             callBack(e);
             return 0;
           }
-          case SDL_WINDOWEVENT_MAXIMIZED: {
+          case SDL_WINDOWEVENT_MAXIMIZED: { // 窗口最大化
             WindowMaximizedEvent e;
             callBack(e);
             return 0;
           }
-          case SDL_WINDOWEVENT_MINIMIZED: {
+          case SDL_WINDOWEVENT_MINIMIZED: { // 窗口最小化
             WindowMinimizedEvent e;
             callBack(e);
             return 0;
           }
-          case SDL_WINDOWEVENT_ENTER: {
+          case SDL_WINDOWEVENT_ENTER: { // 鼠标窗口进入
             WindowEnterEvent e;
             callBack(e);
             return 0;
           }
-          case SDL_WINDOWEVENT_LEAVE: {
+          case SDL_WINDOWEVENT_LEAVE: { // 鼠标窗口离开
             WindowLeaveEvent e;
             callBack(e);
             return 0;
           }
-          case SDL_WINDOWEVENT_EXPOSED: { // 窗口暴露 
+          case SDL_WINDOWEVENT_EXPOSED: { // 窗口暴露
             WindowExposedEvent e;
             callBack(e);
             return 0;
@@ -164,6 +168,22 @@ void WindowsWindow::SetEventFilters(){
           }
         }
         break;
+    }
+    // * Text Input * //
+    case SDL_TEXTINPUT: {
+      TextInputEvent e(event->text.text);
+      callBack(e);
+      return 0;
+    }
+    case SDL_TEXTEDITING: {
+      TextEditingEvent e(event->edit.text, event->edit.start, event->edit.length);
+      callBack(e);
+      return 0;
+    }
+    case SDL_CLIPBOARDUPDATE: {
+      ClipboardChangedEvent e;
+      callBack(e);
+      return 0;
     }
     default: {
       UnKnownEvent e;

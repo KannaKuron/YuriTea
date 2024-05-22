@@ -24,6 +24,9 @@ enum class EventType : uint16 {
   AppTick,
   AppUpdate,
   AppRender,
+  TextInput, // ok
+  TextEditing, // ok
+  ClipboardChanged, // ok
   KeyPressed, // ok
   KeyReleased, // ok
   MouseButtonPressed, // ok
