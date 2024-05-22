@@ -50,5 +50,7 @@ bool Application::OnWindowClose(WindowCloseEvent & e){
   return true;
 }
 
-Application *CreateApplication() { return new Application(); }
+Application *CreateApplication() { 
+  return new Application(); 
+}
 } // namespace YuriTea
