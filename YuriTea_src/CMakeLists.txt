@@ -26,18 +26,28 @@ endif()
 # 定义项目名称和语言
 project(YuriTea LANGUAGES CXX)
 
+if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+    set(CMAKE_C_COMPILER "C:/Program Files/LLVM/bin/clang.exe")
+    set(CMAKE_CXX_COMPILER "C:/Program Files/LLVM/bin/clang++.exe")
+else()
+    set(CMAKE_C_COMPILER "clang")
+    set(CMAKE_CXX_COMPILER "clang++")
+endif()
 
-set(CMAKE_C_COMPILER "C:/Program Files/LLVM/bin/clang.exe")
-set(CMAKE_CXX_COMPILER "C:/Program Files/LLVM/bin/clang++.exe")
 
 
-
+if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
 # 寻找所需的包
 find_package(SDL2 CONFIG REQUIRED)
 find_package(SDL2_image CONFIG REQUIRED)
 find_package(RTTR CONFIG REQUIRED) 
 find_package(FMT CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
+else()
+
+endif()
+
+
 
 set(INCLUDE_DIRS
   Publics
@@ -78,6 +88,9 @@ target_compile_definitions(YuriTea PRIVATE YuriTea_Platform_Windows)
 
 # 设置PCH
 target_precompile_headers(${PROJECT_NAME} PRIVATE  ${CMAKE_CURRENT_SOURCE_DIR}/Publics/YuriTea/Core/core.hpp)
+
+
+
 # 设置库属性
 set_target_properties(YuriTea PROPERTIES
   LINKER_LANGUAGE CXX
@@ -113,6 +126,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 )
 
 
+if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
 # 链接库
 target_link_libraries(${PROJECT_NAME} PRIVATE
   
@@ -122,6 +136,12 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   RTTR::Core
   spdlog::spdlog_header_only
 )
+else()
+  target_link_libraries(${PROJECT_NAME} PRIVATE
+  
+)
+
+endif()
 
 #====================================================================================================
 

@@ -1,5 +1,8 @@
 #pragma once
 #include "YuriTea/Core/window.hpp"
+#include "YuriTea/Events/applicationEvent.hpp"
+#include "YuriTea/Events/keyEvent.hpp"
+#include "YuriTea/Events/mouseEvent.hpp"
 #include <spdlog/spdlog.h>
 
 namespace YuriTea {
@@ -13,6 +16,9 @@ public:
   void OnEvent(Event &);
 
 private:
+
+  bool OnWindowClose(WindowCloseEvent &);
+
   Scope<Window> m_Window;
   bool m_Running = true;
 };

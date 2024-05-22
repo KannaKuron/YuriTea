@@ -14,18 +14,18 @@ Application::Application() {
   m_Window->SetEventCallback(YT_BIND_EVENT_FN(Application::OnEvent));
 }
 
+Application::~Application() {
+  // 析构函数实现
+}
+
 void Application::OnEvent(Event &e) {
   // 事件处理函数实现
   YT_CORE_INFO("Application Call Back OnEvent ,the Event :{0}",e.ToString());
-  if (e.GetEventType() == EventType::WindowClose) {
-    m_Running = false;
-  }
+  EventDispatcher dispatcher(e);
+  dispatcher.Dispatch<WindowCloseEvent>(YT_BIND_EVENT_FN(Application::OnWindowClose));
 
 
-}
 
-Application::~Application() {
-  // 析构函数实现
 }
 
 void Application::Run() {
@@ -43,6 +43,12 @@ void Application::Run() {
   }
 }
 
+
+
+bool Application::OnWindowClose(WindowCloseEvent & e){
+  m_Running = false;
+  return true;
+}
 
 Application *CreateApplication() { return new Application(); }
 } // namespace YuriTea
