@@ -92,6 +92,8 @@ public:
     return GetCategoryFlags() & category;
   }
 
+  inline const bool& IsHandled() const { return m_Handled; }
+
 public:
   Event() = default;          // 默认构造函数
   virtual ~Event() = default; // 默认析构函数

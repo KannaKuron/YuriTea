@@ -21,7 +21,6 @@ set(CMAKE_C_COMPILER "C:/Program Files/LLVM/bin/clang.exe")
 set(CMAKE_CXX_COMPILER "C:/Program Files/LLVM/bin/clang++.exe")
 
 
-set(CMAKE_BUILD_TYPE Debug)
 
 set(DLL_DIR ${CMAKE_SOURCE_DIR}/YuriTeaDLL/lib)
 
@@ -46,12 +45,17 @@ add_custom_command(TARGET YuriTeaTest POST_BUILD
     "${DLL_DIR}/YuriTea.dll"
     $<TARGET_FILE_DIR:YuriTeaTest>
 )
-message("Copy YuriTea.dll to output directory.")
-# 拷贝sdl2.dll
+# 拷贝sdl2.dll 到输出目录 从 vcpkg 安装的sdl2.dll 会被拷贝到输出目录
 add_custom_command(TARGET YuriTeaTest POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    "${DLL_DIR}/SDL2.dll"
-    $<TARGET_FILE_DIR:YuriTeaTest>
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  "C:/vcpkg/installed/x64-windows/bin/SDL2.dll"
+  $<TARGET_FILE_DIR:YuriTeaTest>
+)
+#拷贝fmt.dll
+add_custom_command(TARGET YuriTeaTest POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  "C:/vcpkg/installed/x64-windows/bin/fmt.dll"
+  $<TARGET_FILE_DIR:YuriTeaTest>
 )
 
 # 链接动态导入库

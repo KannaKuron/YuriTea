@@ -8,8 +8,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# 设置构建类型
-set(CMAKE_BUILD_TYPE Release)
 
 # 使用 vcpkg 的工具链文件
 if(DEFINED ENV{VCPKG_TOOLCHAIN_FILE})
@@ -36,16 +34,13 @@ endif()
 
 
 
-if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
 # 寻找所需的包
 find_package(SDL2 CONFIG REQUIRED)
 find_package(SDL2_image CONFIG REQUIRED)
 find_package(RTTR CONFIG REQUIRED) 
-find_package(FMT CONFIG REQUIRED)
+find_package(fmt CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
-else()
 
-endif()
 
 
 
@@ -126,7 +121,6 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 )
 
 
-if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
 # 链接库
 target_link_libraries(${PROJECT_NAME} PRIVATE
   
@@ -134,14 +128,11 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   SDL2::SDL2main
   SDL2_image::SDL2_image
   RTTR::Core
-  spdlog::spdlog_header_only
-)
-else()
-  target_link_libraries(${PROJECT_NAME} PRIVATE
-  
+  fmt::fmt
+  spdlog::spdlog
+
 )
 
-endif()
 
 #====================================================================================================
 

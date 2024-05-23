@@ -13,6 +13,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+#include <fmt/core.h>
 
 #include "YuriTea/Core/basicstruct.hpp"
 #include "YuriTea/Core/base.hpp"

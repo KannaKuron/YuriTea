@@ -3,7 +3,10 @@
 #include "YuriTea/Events/applicationEvent.hpp"
 #include "YuriTea/Events/keyEvent.hpp"
 #include "YuriTea/Events/mouseEvent.hpp"
+#include "YuriTea/Core/layerStack.hpp"
 #include <spdlog/spdlog.h>
+
+
 
 namespace YuriTea {
 
@@ -15,11 +18,16 @@ public:
   void Run();
   void OnEvent(Event &);
 
-private:
+  void PushLayer(Layer *layer);
+  void PushOverlay(Layer *overlay);
 
+private:
   bool OnWindowClose(WindowCloseEvent &);
 
+
+private:
   Scope<Window> m_Window;
+  Scope<LayerStack> m_LayerStack;
   bool m_Running = true;
 };
 

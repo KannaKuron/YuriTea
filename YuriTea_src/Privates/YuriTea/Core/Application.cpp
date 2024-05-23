@@ -9,6 +9,7 @@ Application::Application() {
   // 构造函数实现
   WindowProps props;
   m_Window = Window::Create(props);
+  m_LayerStack.reset(new LayerStack());
   m_Running = true;
 
   m_Window->SetEventCallback(YT_BIND_EVENT_FN(Application::OnEvent));
@@ -16,30 +17,34 @@ Application::Application() {
 
 Application::~Application() {
   // 析构函数实现
+
 }
 
 void Application::OnEvent(Event &e) {
   // 事件处理函数实现
   YT_CORE_INFO("Application Call Back OnEvent ,the Event :{0}",e.ToString());
   EventDispatcher dispatcher(e);
-  dispatcher.Dispatch<WindowCloseEvent>(YT_BIND_EVENT_FN(Application::OnWindowClose));
+  if( dispatcher.Dispatch<WindowCloseEvent>(YT_BIND_EVENT_FN(Application::OnWindowClose)))
+    return;
 
-
-
+  // 逆序遍历LayerStack ,处理事件 保证先处理Overlay再处理Layer
+  for (auto it = m_LayerStack->end(); it != m_LayerStack->begin();) {
+    (*--it)->OnEvent(e);
+    if (e.IsHandled()) {
+      break;
+    }
+  }
 }
+
 
 void Application::Run() {
   YT_CORE_INFO("Application Loop now is Running");
   while (m_Running) {
     // 一直循环
-    gladLoadGLLoader(SDL_GL_GetProcAddress);
-
-    SDL_Window *window = static_cast<SDL_Window *>(m_Window->GetNativeWindow());
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-    SDL_GL_SwapWindow(window);
+    for (Layer *layer : *m_LayerStack) {
+      layer->OnUpdate();
+    }
     m_Window->OnUpdate();
-    SDL_PumpEvents(); // 更新事件
   }
 }
 
@@ -49,6 +54,17 @@ bool Application::OnWindowClose(WindowCloseEvent & e){
   m_Running = false;
   return true;
 }
+
+void Application::PushLayer(Layer *layer){
+  m_LayerStack->PushLayer(layer);
+
+}
+
+void Application::PushOverlay(Layer *overlay){
+  m_LayerStack->PushOverlay(overlay);
+
+}
+
 
 Application *CreateApplication() { 
   return new Application(); 
