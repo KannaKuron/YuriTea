@@ -1,13 +1,8 @@
 build/*
-YuriTea_src/build/*
+src/build/*
 
 .cache/*
-YuriTea_src/.cache/*
-
-YuriTeaDLL/*
-YuriTea_src/YuriTeaDLL/*
-
-CMakeUserPresets.json
-CMakePresets.json
+src/.cache/*
 
 .vs/*
+.git/*
