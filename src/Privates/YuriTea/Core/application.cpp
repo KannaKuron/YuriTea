@@ -1,7 +1,4 @@
 #include "YuriTea/Core/application.hpp"
-#include <YuriTea/glad/glad.hpp>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_opengl.h>
 
 namespace YuriTea {
 

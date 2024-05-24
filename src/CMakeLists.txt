@@ -1,168 +1,77 @@
 # 要求 cmake 的最低版本
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.20.0)
 
-# 导出编译命令
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_C_COMPILER "C:/Program Files/LLVM/bin/clang.exe")
+set(CMAKE_CXX_COMPILER "C:/Program Files/LLVM/bin/clang++.exe")
 
 # 设置 C++ 标准
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-
-# 使用 vcpkg 的工具链文件
-if(DEFINED ENV{VCPKG_TOOLCHAIN_FILE})
-    set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_TOOLCHAIN_FILE}")
-elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
-    set(CMAKE_TOOLCHAIN_FILE "C:/vcpkg/scripts/buildsystems/vcpkg.cmake")
-else()
-    # 对于非Windows系统，可以选择不设置CMAKE_TOOLCHAIN_FILE
-    # 或者设置为默认的工具链文件路径，这里选择不设置
-    # 如果需要为其他系统指定默认路径，可以取消注释下面的行
-    # set(CMAKE_TOOLCHAIN_FILE "/path/to/default/toolchain/file")
-endif()
-
 # 定义项目名称和语言
 project(YuriTea LANGUAGES CXX)
 
-if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
-    set(CMAKE_C_COMPILER "C:/Program Files/LLVM/bin/clang.exe")
-    set(CMAKE_CXX_COMPILER "C:/Program Files/LLVM/bin/clang++.exe")
-else()
-    set(CMAKE_C_COMPILER "clang")
-    set(CMAKE_CXX_COMPILER "clang++")
-endif()
+
+# 导出编译命令
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 
 
-# 寻找所需的包
-find_package(SDL2 CONFIG REQUIRED)
-find_package(SDL2_image CONFIG REQUIRED)
-find_package(RTTR CONFIG REQUIRED) 
-find_package(fmt CONFIG REQUIRED)
-find_package(spdlog CONFIG REQUIRED)
+set(PUBLICS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Publics)
+set(PRIVATES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Privates)
+set(DEPENDENCIES_HEADERS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/vendor/include)
 
-
-
-
-set(INCLUDE_DIRS
-  Publics
-)
-set(SRC_DIRS
-  Privates
-)
-
-# 递归添加所有源文件和头文件
-file(GLOB_RECURSE SRC_FILES
-  ${SRC_DIRS}/*.cpp
-  ${SRC_DIRS}/*.c
-
-)
-
-file(GLOB_RECURSE HEADER_FILES
-  ${INCLUDE_DIRS}/*.hpp
-  ${INCLUDE_DIRS}/*.h
-)
-
-
-# 设置安装目录
-set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/YuriTeaDLL)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${CMAKE_SOURCE_DIR}/YuriTeaDLL/lib)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/YuriTeaDLL/lib)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_SOURCE_DIR}/YuriTeaDLL/lib)
+file(GLOB_RECURSE SRC_FILES ${PUBLICS_DIR}/*.*)
 
 # 创建 YuriTea 库
-add_library(YuriTea SHARED ${SRC_FILES})
+add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+
+# 设定宏定义
+target_compile_definitions(${PROJECT_NAME} PRIVATE   YuriTea_Platform_Windows)
+target_compile_definitions(${PROJECT_NAME} PRIVATE   YuriTea_DEBUG)
+target_compile_definitions(${PROJECT_NAME} PRIVATE   YuriTea_ENABLE_ASSERTS)
+target_compile_definitions(${PROJECT_NAME} PRIVATE   YuriTea_BUILD_DLL)
 
 
-#设定宏定义
-target_compile_definitions(YuriTea PRIVATE YuriTea_DEBUG)
-target_compile_definitions(YuriTea PRIVATE YuriTea_ENABLE_ASSERTS)
-target_compile_definitions(YuriTea PRIVATE YuriTea_DLL)
-target_compile_definitions(YuriTea PRIVATE YuriTea_Platform_Windows)
 
+# 设置 include 目录
+target_include_directories(${PROJECT_NAME} PRIVATE 
+  ${PUBLICS_DIR}
+  ${DEPENDENCIES_HEADERS_DIR}
+)
+
+
+# 设置用到的其他的动态库和其对应的动态导入库
+# 文件都在vendor/libs目录下
+#target_link_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/vendor/libs) # 设置动态库目录
+
+# 寻找动态库
+find_library(SPDLOG spdlog HINTS ${CMAKE_CURRENT_SOURCE_DIR}/vendor/libs REQUIRED)
+find_library(SDL2 SDL2 HINTS ${CMAKE_CURRENT_SOURCE_DIR}/vendor/libs REQUIRED)
+find_library(SDL2_IMAGE SDL2_image HINTS ${CMAKE_CURRENT_SOURCE_DIR}/vendor/libs REQUIRED)
+find_library(GLAD glad HINTS ${CMAKE_CURRENT_SOURCE_DIR}/vendor/libs REQUIRED)
+find_library(RTTR_CORE rttr_core HINTS ${CMAKE_CURRENT_SOURCE_DIR}/vendor/libs REQUIRED)
+
+
+target_link_libraries(${PROJECT_NAME} PUBLIC
+  ${SPDLOG}
+  ${SDL2}
+  ${SDL2_IMAGE}
+  ${GLAD}
+  ${RTTR_CORE}
+)
 
 # 设置PCH
-target_precompile_headers(${PROJECT_NAME} PRIVATE  ${CMAKE_CURRENT_SOURCE_DIR}/Publics/YuriTea/Core/core.hpp)
-
-
+target_precompile_headers(${PROJECT_NAME} PRIVATE
+  ${CMAKE_CURRENT_SOURCE_DIR}/Publics/YuriTea/Core/core.hpp
+)
 
 # 设置库属性
 set_target_properties(YuriTea PROPERTIES
   LINKER_LANGUAGE CXX
-  # RUNTIME_OUTPUT_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
   LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib
   ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib
+  RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib
   OUTPUT_NAME "YuriTea"
   PREFIX "" # 去除生成的 dll 文件名前缀
 )
-
-
-
-set(DEPENDENCIES_DIRS
-
-  ${SDL2_INCLUDE_DIR}
-
-  ${RTTR_INCLUDE_DIR}
-
-  ${FMT_INCLUDE_DIR}
-
-  ${SPDLOG_INCLUDE_DIR}
-
-)
-
-
-
-
-# 添加头文件路径
-target_include_directories(${PROJECT_NAME} PRIVATE
-  
-  ${INCLUDE_DIRS}
-  ${DEPENDENCIES_DIRS}
-)
-
-
-# 链接库
-target_link_libraries(${PROJECT_NAME} PRIVATE
-  
-  SDL2::SDL2
-  SDL2::SDL2main
-  SDL2_image::SDL2_image
-  RTTR::Core
-  fmt::fmt
-  spdlog::spdlog
-
-)
-
-
-#====================================================================================================
-
-
-
-#install sdl2 and sdl2_image and rttr 的头文件
-install(DIRECTORY 
-  ${DEPENDENCIES_DIRS}
-  DESTINATION ${CMAKE_SOURCE_DIR}/YuriTeaDLL/Publics
-)
-
-# 安装头文件到 include 目录，保持原始文件夹结构
-install(DIRECTORY 
-
-  ${INCLUDE_DIRS}
-
-  DESTINATION ${CMAKE_SOURCE_DIR}/YuriTeaDLL
-)
-
-# 安装 YuriTea 库
-install(TARGETS ${PROJECT_NAME}
-        
-
-        RUNTIME DESTINATION ${CMAKE_SOURCE_DIR}/YuriTeaDLL/lib
-
-        LIBRARY DESTINATION ${CMAKE_SOURCE_DIR}/YuriTeaDLL/lib
-
-        ARCHIVE DESTINATION ${CMAKE_SOURCE_DIR}/YuriTeaDLL/lib
-
-)
-
-
-
