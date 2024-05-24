@@ -1,5 +1,4 @@
 #pragma once
-#include <memory>
 
 typedef signed char int8;
 typedef short int16;

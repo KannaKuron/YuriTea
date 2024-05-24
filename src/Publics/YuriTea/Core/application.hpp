@@ -1,4 +1,5 @@
 #pragma once
+#include "YuriTea/Core/core.hpp"
 #include "YuriTea/Core/window.hpp"
 #include "YuriTea/Events/applicationEvent.hpp"
 #include "YuriTea/Events/keyEvent.hpp"

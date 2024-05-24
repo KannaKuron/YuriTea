@@ -1,6 +1,5 @@
 #pragma once
 #include "YuriTea/Core/core.hpp"
-#include <SDL2/SDL_scancode.h>
 
 namespace YuriTea {
 

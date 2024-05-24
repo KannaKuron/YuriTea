@@ -1,6 +1,5 @@
 #pragma once
 
-#include "YuriTea/Core/base.hpp"
 #include "YuriTea/Core/core.hpp"
 
 namespace YuriTea {

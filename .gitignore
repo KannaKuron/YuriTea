@@ -6,3 +6,5 @@ src/.cache/*
 
 .vs/*
 .git/*
+
+src/lib/*

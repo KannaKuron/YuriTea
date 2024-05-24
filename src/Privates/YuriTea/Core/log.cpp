@@ -1,8 +1,5 @@
 #include "YuriTea/Core/log.hpp"
-#include "spdlog.h"
-#include "spdlog/sinks/stdout_color_sinks.h"
-#include <fcntl.h>
-#include <io.h>
+
 
 namespace YuriTea {
 std::shared_ptr<spdlog::logger> Log::s_CoreLogger =

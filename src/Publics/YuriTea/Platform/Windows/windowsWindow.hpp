@@ -1,6 +1,6 @@
 #pragma once
+#include "YuriTea/Core/core.hpp"
 #include "YuriTea/Core/window.hpp"
-#include <sdl2/SDL.h>
 
 namespace YuriTea {
 static bool s_SDLInitialized = false;

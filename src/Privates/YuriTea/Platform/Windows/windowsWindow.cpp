@@ -1,23 +1,18 @@
 #include "YuriTea/Platform/Windows/windowsWindow.hpp"
-#include "YuriTea/Core/core.hpp"
 #include "YuriTea/Core/keyCodes.hpp"
-#include "YuriTea/Core/log.hpp"
 #include "YuriTea/Events/applicationEvent.hpp"
 #include "YuriTea/Events/keyEvent.hpp"
 #include "YuriTea/Events/mouseEvent.hpp"
-#include "YuriTea/glad/glad.hpp"
-#include <SDL2/SDL_events.h>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_opengl.h>
+#include "YuriTea/Core/core.hpp"
 
 namespace YuriTea {
 
 void WindowsWindow::OnUpdate() {
 
+  SDL_PumpEvents(); // 更新事件
   glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
   SDL_GL_SwapWindow(m_Window);
-  SDL_PumpEvents(); // 更新事件
 
 }
 
@@ -220,7 +215,11 @@ void WindowsWindow::SetEventWatchs(){
 
 WindowsWindow::WindowsWindow(const WindowProps &props) { 
   Init(props); 
-  gladLoadGLLoader(SDL_GL_GetProcAddress);
+  auto resl = gladLoadGLLoader(SDL_GL_GetProcAddress);
+  if (!resl) {
+    YT_CORE_ERROR("Glad加载失败");
+    YT_CORE_ASSERT(false, "Glad加载失败");
+  }
 }
 
 WindowsWindow::~WindowsWindow() {

@@ -22,8 +22,8 @@
 #ifndef __glad_h_
 #define __glad_h_
 
-#ifdef __gl_h_
-#error OpenGL header already included, remove this include, glad already provides it
+#ifdef __gl_h_ //我自己注销掉的
+#error OpenGL header already included, remove this include, glad already provides it 
 #endif
 #define __gl_h_
 
