@@ -224,6 +224,8 @@ WindowsWindow::WindowsWindow(const WindowProps &props) {
 
 WindowsWindow::~WindowsWindow() {
   // 析构函数实现
+  YT_CORE_WARN("正在执行WindowsWindow析构函数");
+  YT_CORE_FLUSH();
   Shutdown();
   m_Context = nullptr;
   m_Window = nullptr;
@@ -301,7 +303,7 @@ void WindowsWindow::Init(const WindowProps &props) {
 
 void WindowsWindow::Shutdown() {
   // 关闭函数实现
-  YT_CORE_INFO("关闭窗口 {0} ({1}, {2})", m_Data.Title, m_Data.WindowSize.x,
+  YT_CORE_WARN("关闭窗口 {0} ({1}, {2})", m_Data.Title, m_Data.WindowSize.x,
                m_Data.WindowSize.y);
 
   SDL_GL_DeleteContext(m_Context);

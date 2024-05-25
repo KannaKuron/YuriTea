@@ -1,6 +1,8 @@
 #include "YuriTea/Core/application.hpp"
+#include "YuriTea/Core/basicstruct.hpp"
 
 namespace YuriTea {
+Scope<Application> Application::m_App = nullptr;
 
 Application::Application() {
   // 构造函数实现
@@ -14,6 +16,9 @@ Application::Application() {
 
 Application::~Application() {
   // 析构函数实现
+  YT_CORE_INFO("Application Call Back Destructor 正在析构Application类");
+  m_Window.reset();
+  m_LayerStack.reset();
 
 }
 
@@ -44,7 +49,17 @@ void Application::Run() {
     m_Window->OnUpdate();
   }
 }
+void Application::Start(Application *app) {
+  m_App.reset(app);
+  m_App->Run();
+}
 
+int32 Application::Close(){
+  //循环检查m_AllQuit是否为true 否则一直循环
+
+  m_App.reset();
+  return 0;
+}
 
 
 bool Application::OnWindowClose(WindowCloseEvent & e){
@@ -64,6 +79,6 @@ void Application::PushOverlay(Layer *overlay){
 
 
 Application *CreateApplication() { 
-  return new Application(); 
+  return new Application();
 }
 } // namespace YuriTea

@@ -18,13 +18,10 @@ public:
 
 
 
-
-
-
 class SandBox : public YuriTea::Application {
 
 public:
-  SandBox(): Application() {
+  SandBox() {
     PushLayer(new ExampleLayer());
 
   }

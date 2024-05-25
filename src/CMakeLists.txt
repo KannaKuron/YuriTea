@@ -30,10 +30,10 @@ add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
 target_compile_definitions(${PROJECT_NAME} PRIVATE YuriTea_Platform_Windows)
 target_compile_definitions(${PROJECT_NAME} PRIVATE YuriTea_BUILD_DLL)
 
-#如果是release 则不执行下面的宏添加
-if(CMAKE_BUILD_TYPE MATCHES Debug)
-target_compile_definitions(${PROJECT_NAME} PRIVATE YuriTea_DEBUG)
-target_compile_definitions(${PROJECT_NAME} PRIVATE YuriTea_ENABLE_ASSERTS)
+#如果编译模式为Debug，定义 YuriTea_DEBUG 和 YuriTea_ENABLE_ASSERTS
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  target_compile_definitions(${PROJECT_NAME} PRIVATE YuriTea_DEBUG)
+  target_compile_definitions(${PROJECT_NAME} PRIVATE YuriTea_ENABLE_ASSERTS)
 endif()
 
 # 设置 include 目录
@@ -52,12 +52,14 @@ target_precompile_headers(${PROJECT_NAME} PRIVATE
 target_link_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/vendor/libs) # 设置动态库目录
 
 # 寻找动态库
-find_library(SPDLOG spdlog HINTS ${CMAKE_CURRENT_SOURCE_DIR}/vendor/libs REQUIRED)
-find_library(SDL2 SDL2 HINTS ${CMAKE_CURRENT_SOURCE_DIR}/vendor/libs REQUIRED)
-find_library(SDL2_MAIN SDL2main HINTS ${CMAKE_CURRENT_SOURCE_DIR}/vendor/libs REQUIRED)
-find_library(SDL2_IMAGE SDL2_image HINTS ${CMAKE_CURRENT_SOURCE_DIR}/vendor/libs REQUIRED)
-find_library(RTTR_CORE rttr_core HINTS ${CMAKE_CURRENT_SOURCE_DIR}/vendor/libs REQUIRED)
-find_library(FMT fmt HINTS ${CMAKE_CURRENT_SOURCE_DIR}/vendor/libs REQUIRED)
+find_library(SPDLOG NAMES spdlog  REQUIRED)
+find_library(SDL2 NAMES SDL2 REQUIRED)
+find_library(SDL2_MAIN NAMES SDL2main  REQUIRED)
+find_library(SDL2_IMAGE NAMES SDL2_image REQUIRED)
+find_library(RTTR_CORE NAMES rttr_core REQUIRED)
+find_library(FMT NAMES fmt REQUIRED)
+find_library(IMGUI NAMES imgui PATHS ${CMAKE_CURRENT_SOURCE_DIR}/vendor/libs REQUIRED)
+find_library(GLAD NAMES glad PATHS ${CMAKE_CURRENT_SOURCE_DIR}/vendor/libs REQUIRED)
 
 # 检查库是否找到
 if(NOT SPDLOG)
@@ -75,6 +77,12 @@ endif()
 if(NOT FMT)
   message(FATAL_ERROR "fmt library not found.")
 endif()
+if(NOT GLAD)
+  message(FATAL_ERROR "glad library not found.")
+endif()
+if(NOT IMGUI)
+  message(FATAL_ERROR "imgui library not found.")
+endif()
 
 # 链接库
 target_link_libraries(${PROJECT_NAME} PRIVATE
@@ -84,6 +92,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   ${SDL2_IMAGE}
   ${RTTR_CORE}
   ${FMT}
+  ${GLAD}
+  ${IMGUI}
 )
 
 

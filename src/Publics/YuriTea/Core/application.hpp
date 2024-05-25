@@ -1,4 +1,5 @@
 #pragma once
+#include "YuriTea/Core/base.hpp"
 #include "YuriTea/Core/core.hpp"
 #include "YuriTea/Core/window.hpp"
 #include "YuriTea/Events/applicationEvent.hpp"
@@ -11,27 +12,32 @@
 namespace YuriTea {
 
 class YURITEA_API Application {
+  friend Application *CreateApplication();
 public:
-  Application();          // 构造函数
   virtual ~Application(); // 析构函数
 
+  static void Start(Application *);
+  static int32 Close();
   void Run();
   void OnEvent(Event &);
+
 
   void PushLayer(Layer *layer);
   void PushOverlay(Layer *overlay);
 
+protected:
+    Application();          // 构造函数
 private:
   bool OnWindowClose(WindowCloseEvent &);
 
 
 private:
+  static Scope<Application> m_App;
   Scope<Window> m_Window;
   Scope<LayerStack> m_LayerStack;
   bool m_Running = true;
 };
 
-// To be defined in CLIENT
 Application *CreateApplication();
 
 } // namespace YuriTea

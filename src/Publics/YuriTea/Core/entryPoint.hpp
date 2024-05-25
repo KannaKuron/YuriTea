@@ -6,7 +6,8 @@ int main(int32 argc, char **argv) {
   YuriTea::Log::Init();
 
   auto app = YuriTea::CreateApplication();
-  app->Run();
-  delete app;
-  return 0;
+
+  YuriTea::Application::Start(app);
+  
+  return YuriTea::Application::Close();
 }

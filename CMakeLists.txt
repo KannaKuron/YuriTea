@@ -19,9 +19,12 @@ add_executable(${PROJECT_NAME}
   ./SandBox.cpp
 )
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE YuriTea_DEBUG)
-target_compile_definitions(${PROJECT_NAME} PRIVATE YuriTea_ENABLE_ASSERTS)
 target_compile_definitions(${PROJECT_NAME} PRIVATE YuriTea_Platform_Windows)
+target_compile_definitions(${PROJECT_NAME}
+  PRIVATE $<$<CONFIG:Debug>:YuriTea_DEBUG>
+  PRIVATE $<$<CONFIG:Debug>:YuriTea_ENABLE_ASSERTS>
+)
+
 
 # 添加头文件目录
 target_include_directories(${PROJECT_NAME} PRIVATE 
@@ -54,11 +57,11 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 
 
 # 如果文件不同则复制
-add_custom_command(TARGET YuriTeaTest POST_BUILD
+
+add_custom_target(copy_files ALL
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
     "${YURITEA_DLL_PATH}\\YuriTea.dll"
     "$<TARGET_FILE_DIR:YuriTeaTest>"
-    COMMENT "Copying YuriTea.dll to output directory"
 
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
     "${CMAKE_CURRENT_SOURCE_DIR}\\src\\vendor\\libs\\SDL2.dll"
@@ -79,7 +82,7 @@ add_custom_command(TARGET YuriTeaTest POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
     "${CMAKE_CURRENT_SOURCE_DIR}\\src\\vendor\\libs\\spdlog.dll"
     "$<TARGET_FILE_DIR:YuriTeaTest>"
-
 )
 
-
+# 确保在每次构建时都执行 copy_files 目标
+set_target_properties(copy_files PROPERTIES EXCLUDE_FROM_DEFAULT_BUILD FALSE)
