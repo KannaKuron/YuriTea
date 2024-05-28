@@ -1,9 +1,9 @@
 #include "YuriTea/Platform/Windows/windowsWindow.hpp"
+#include "YuriTea/Core/core.hpp"
 #include "YuriTea/Core/keyCodes.hpp"
 #include "YuriTea/Events/applicationEvent.hpp"
 #include "YuriTea/Events/keyEvent.hpp"
 #include "YuriTea/Events/mouseEvent.hpp"
-#include "YuriTea/Core/core.hpp"
 
 namespace YuriTea {
 
@@ -202,9 +202,6 @@ void WindowsWindow::SetEventWatchs(){
   SDL_AddEventWatch([](void * data_t,SDL_Event* event)->int{
     auto callBack = static_cast<WindowData*>(data_t)->EventCallback;
 
-
-
-
     return 0; // 返回值会被忽略
   }, &m_Data );
 #endif
@@ -215,11 +212,7 @@ void WindowsWindow::SetEventWatchs(){
 
 WindowsWindow::WindowsWindow(const WindowProps &props) { 
   Init(props); 
-  auto resl = gladLoadGLLoader(SDL_GL_GetProcAddress);
-  if (!resl) {
-    YT_CORE_ERROR("Glad加载失败");
-    YT_CORE_ASSERT(false, "Glad加载失败");
-  }
+
 }
 
 WindowsWindow::~WindowsWindow() {
@@ -275,6 +268,7 @@ void WindowsWindow::Init(const WindowProps &props) {
     YT_CORE_INFO("SDL窗口创建成功");
   }
 
+
   SDL_SetWindowData(m_Window, "YuRiTea-Main-Window", &m_Data);
 
   m_Context = SDL_GL_CreateContext(m_Window);
@@ -289,6 +283,25 @@ void WindowsWindow::Init(const WindowProps &props) {
     YT_CORE_INFO("OpenGL上下文创建成功");
   }
 
+  int res_ = SDL_GL_MakeCurrent(m_Window, m_Context);
+  if (res_ != 0) {
+    YT_CORE_ERROR("OpenGL上下文设置失败: {0}", SDL_GetError());
+    SDL_GL_DeleteContext(m_Context);
+    SDL_DestroyWindow(m_Window);
+    SDL_Quit();
+    YT_CORE_ASSERT(false, "OpenGL上下文设置失败");
+    return;
+  } else {
+    YT_CORE_INFO("OpenGL上下文设置成功");
+  }
+
+  auto resl = gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress);
+  if (!resl) {
+    YT_CORE_ERROR("Glad加载失败");
+    YT_CORE_ASSERT(false, "Glad加载失败");
+  }
+
+
   // 设置事件回调函数
   SetEventFilters();
   SetEventWatchs();
@@ -296,6 +309,7 @@ void WindowsWindow::Init(const WindowProps &props) {
   SetFullscreen(m_Data.Fullscreen);
   SetCursorVisible(m_Data.CursorVisible);
   SetVSync(m_Data.VSync);
+
 }
 
 
@@ -321,7 +335,9 @@ void WindowsWindow::SetVSync(bool enabled) {
   }
 }
 
-bool WindowsWindow::IsVSync() const { return m_Data.VSync; }
+bool WindowsWindow::IsVSync() const { 
+  return m_Data.VSync;
+}
 
 void WindowsWindow::SetFullscreen(bool enabled) {
   // 全屏函数实现
