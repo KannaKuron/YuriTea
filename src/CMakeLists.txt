@@ -1,7 +1,14 @@
 cmake_minimum_required(VERSION 3.20.0)
 
+#if windows
+if(WIN32)
 set(CMAKE_C_COMPILER "C:/Program Files/LLVM/bin/clang.exe" CACHE STRING "")
 set(CMAKE_CXX_COMPILER "C:/Program Files/LLVM/bin/clang++.exe" CACHE STRING "")
+else()
+set(CMAKE_C_COMPILER "clang" CACHE STRING "")
+set(CMAKE_CXX_COMPILER "clang++" CACHE STRING "")
+endif()
+
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 

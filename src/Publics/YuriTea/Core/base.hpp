@@ -7,8 +7,14 @@
   #else 
     #define YURITEA_API __declspec(dllimport)
   #endif 
-#else // YuriTea_Platform_Windows
-  #error YuriTea only supports Windows!
+#else 
+  //linux or other platform
+  //#error YuriTea only supports Windows!
+  #ifdef  YuriTea_BUILD_DLL
+    #define YURITEA_API 
+  #else 
+    #define YURITEA_API 
+  #endif 
 #endif // YuriTea_Platform_Windows
 
 
