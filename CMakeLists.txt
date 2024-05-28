@@ -1,8 +1,13 @@
 #要求cmake的最低版本 3.20
 cmake_minimum_required(VERSION 3.20.0)
 
-set(CMAKE_C_COMPILER "C:/Program Files/LLVM/bin/clang.exe")
-set(CMAKE_CXX_COMPILER "C:/Program Files/LLVM/bin/clang++.exe")
+if(WIN32)
+set(CMAKE_C_COMPILER "C:/Program Files/LLVM/bin/clang.exe" CACHE STRING "")
+set(CMAKE_CXX_COMPILER "C:/Program Files/LLVM/bin/clang++.exe" CACHE STRING "")
+else()
+set(CMAKE_C_COMPILER "clang" CACHE STRING "")
+set(CMAKE_CXX_COMPILER "clang++" CACHE STRING "")
+endif()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -19,7 +24,10 @@ add_executable(${PROJECT_NAME}
   ./SandBox.cpp
 )
 
+if(WIN32)
 target_compile_definitions(${PROJECT_NAME} PRIVATE YuriTea_Platform_Windows)
+endif()
+
 target_compile_definitions(${PROJECT_NAME}
   PRIVATE $<$<CONFIG:Debug>:YuriTea_DEBUG>
   PRIVATE $<$<CONFIG:Debug>:YuriTea_ENABLE_ASSERTS>
@@ -33,6 +41,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 )
 
 
+if(WIN32)
 
 # 链接动态导入库
 find_library(YURITEA YuriTea HINTS "${YURITEA_DLL_PATH}")
@@ -86,3 +95,5 @@ add_custom_target(copy_files ALL
 
 # 确保在每次构建时都执行 copy_files 目标
 set_target_properties(copy_files PROPERTIES EXCLUDE_FROM_DEFAULT_BUILD FALSE)
+
+endif()
