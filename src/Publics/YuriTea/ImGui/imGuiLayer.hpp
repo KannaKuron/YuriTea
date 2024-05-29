@@ -3,6 +3,7 @@
 #include "YuriTea/Core/core.hpp"
 #include "YuriTea/Core/layer.hpp"
 
+
 namespace YuriTea {
 
 class YURITEA_API ImGuiLayer : public Layer {
@@ -18,6 +19,10 @@ public:
 
   
   
+
+private:
+  ImGuiIO* io; 
+  float32 m_Time = 0.0f;
 
 
 

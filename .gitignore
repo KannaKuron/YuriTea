@@ -1,5 +1,7 @@
 build/*
+build_vs/*
 src/build/*
+src/build_vs/*
 
 .cache/*
 src/.cache/*

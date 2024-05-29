@@ -18,6 +18,10 @@ public:
 
   static void Start(Application *);
   static int32 Close();
+  static Application *Get() { return m_App.get(); }
+
+  Window* GetWindow() { return m_Window.get(); }
+
   void Run();
   void OnEvent(Event &);
 

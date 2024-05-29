@@ -5,6 +5,8 @@ namespace YuriTea {
 Scope<Application> Application::m_App = nullptr;
 
 Application::Application() {
+  m_App.reset(this);
+  
   // 构造函数实现
   WindowProps props;
   m_Window = Window::Create(props);
@@ -41,6 +43,7 @@ void Application::OnEvent(Event &e) {
 
 void Application::Run() {
   YT_CORE_INFO("Application Loop now is Running");
+  YT_CORE_INFO("m_Running {0}",m_Running);
   while (m_Running) {
     // 一直循环
     for (Layer *layer : *m_LayerStack) {

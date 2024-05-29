@@ -3,6 +3,19 @@
 #include "YuriTea/Events/event.hpp"
 
 namespace YuriTea {
+using EventCallbackFn = std::function<void(Event &)>;
+struct WindowData {
+  // 利用一个uint8来记录图形api类型 vulkan 还是 opengl
+  uint8 GraphicsAPI;
+  uint32 APIVersion;
+  std::string Title;
+  Vector2<uint32> WindowSize;
+  bool VSync; // 垂直同步
+  bool Fullscreen; // 全屏
+  bool CursorVisible; // 鼠标可见
+  EventCallbackFn EventCallback; // 事件回调函数
+    
+  };
 
 struct WindowProps {
   std::string Title;
@@ -16,7 +29,6 @@ struct WindowProps {
 // interface representing a desktop system based Window
 class YURITEA_API Window {
 public:
-  using EventCallbackFn = std::function<void(Event &)>;
   Window() = default;
   virtual ~Window() = default;
 
@@ -39,6 +51,8 @@ public:
   virtual bool IsCursorVisible() const = 0;
 
   virtual void *GetNativeWindow() const = 0;
+  virtual void *GetNativeContext() const = 0;
+  virtual void *GetNativeData() const = 0;
 
   static Scope<Window> Create(const WindowProps &props = WindowProps());
 };

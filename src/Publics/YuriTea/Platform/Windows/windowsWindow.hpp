@@ -6,17 +6,6 @@ namespace YuriTea {
 static bool s_SDLInitialized = false;
 
 class YURITEA_API WindowsWindow : public Window {
-  public:
-  struct WindowData {
-    std::string Title;
-    Vector2<uint32> WindowSize;
-    bool VSync; // 垂直同步
-    bool Fullscreen; // 全屏
-    bool CursorVisible; // 鼠标可见
-    EventCallbackFn EventCallback; // 事件回调函数
-    
-  };
-
 public:
   WindowsWindow(const WindowProps &props);
   ~WindowsWindow();                        // 析构函数
@@ -41,6 +30,8 @@ public:
   virtual bool IsCursorVisible() const override;
 
   virtual void *GetNativeWindow() const override { return m_Window; }
+  virtual void *GetNativeContext() const override { return m_Context; }
+  virtual void *GetNativeData() const override { return (void*)&m_Data; }
 
 private:
   void Init(const WindowProps &props);
