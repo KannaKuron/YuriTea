@@ -1,5 +1,6 @@
 #pragma once
-#include "YuriTea/Core/basicstruct.hpp"
+
+#include "YuriTea/Core/basicstruct.hpp" 
 
 #ifdef YuriTea_Platform_Windows
   #ifdef  YuriTea_BUILD_DLL
@@ -33,3 +34,16 @@
 #define YT_ASSERT(x, ...)
 #define YT_CORE_ASSERT(x, ...)
 #endif
+
+template<typename T>
+const char* __ToBits(const T& x){
+  int32 size = sizeof(x) *8;
+  char buf[size+1];
+  for (int i = 0 ;i < size; i++){
+    buf[i] = x & BIT(i) ? '1' : '0';
+  }
+  buf[size] = '\0';
+  return buf;
+}
+
+#define YT_TOBITS(x) __ToBits(x)

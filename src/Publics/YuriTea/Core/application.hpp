@@ -1,5 +1,4 @@
 #pragma once
-#include "YuriTea/Core/base.hpp"
 #include "YuriTea/Core/core.hpp"
 #include "YuriTea/Core/window.hpp"
 #include "YuriTea/Events/applicationEvent.hpp"
@@ -26,8 +25,8 @@ public:
   void OnEvent(Event &);
 
 
-  void PushLayer(Layer *layer);
-  void PushOverlay(Layer *overlay);
+  void PushLayer(Layer *&& layer);
+  void PushOverlay(Layer *&& overlay);
 
 protected:
     Application();          // 构造函数

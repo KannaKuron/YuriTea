@@ -1,6 +1,5 @@
 #pragma once
-
-#include "YuriTea/Core/core.hpp"
+#include "YuriTea/Core/base.hpp"
 
 namespace YuriTea {
 
@@ -34,13 +33,18 @@ enum class EventType : uint16 {
   MouseScrolled // ok
 };
 
-enum EventCategory : uint8 {
+enum EventCategory : uint16 {
+  EventCategoryAll = 0xFF,          // 11111111 所有事件
   None = 0, // 00000000 None event
   EventCategoryApplication = BIT(0), // BIT(0) = 00000001 应用事件
   EventCategoryInput = BIT(1),       // BIT(1) = 00000010 输入事件
   EventCategoryKeyboard = BIT(2),    // BIT(2) = 00000100 键盘事件
   EventCategoryMouse = BIT(3),       // BIT(3) = 00001000 鼠标事件
-  EventCategoryMouseButton = BIT(4)  // BIT(4) = 00010000 鼠标按键事件
+  EventCategoryMouseButton = BIT(4), // BIT(4) = 00010000 鼠标按键事件
+  EventCategoryWindow = BIT(5),      // BIT(5) = 00100000 窗口事件
+  EventCategoryTextInput = BIT(6),   // BIT(6) = 01000000 文本输入事件
+  EventCategoryJoystick = BIT(7),    // BIT(7) = 10000000 手柄事件
+  EventCategoryCustom = BIT(8)       // BIT(8) = 100000000 自定义事件
 };
 
 #define EVENT_CLASS_TYPE(type)                                                 \
@@ -49,7 +53,7 @@ enum EventCategory : uint8 {
   virtual const char *GetName() const override { return #type; }
 
 #define EVENT_CLASS_CATEGORY(category)                                         \
-  virtual uint32_t GetCategoryFlags() const override { return category; }
+  virtual uint32 GetCategoryFlags() const override { return category; }
 
 
 

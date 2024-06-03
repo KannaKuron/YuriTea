@@ -39,6 +39,10 @@
 #include "YuriTea/Core/base.hpp"
 
 #include "YuriTea/Core/log.hpp"
+#include "YuriTea/Events/event.hpp"
+#include "YuriTea/Events/applicationEvent.hpp"
+#include "YuriTea/Events/keyEvent.hpp"
+#include "YuriTea/Events/mouseEvent.hpp"
 
 #ifdef YuriTea_Platform_Windows
 #include <Windows.h>

@@ -13,6 +13,7 @@ struct WindowData {
   bool VSync; // 垂直同步
   bool Fullscreen; // 全屏
   bool CursorVisible; // 鼠标可见
+  bool WindowResizeable; // 窗口可调整大小
   EventCallbackFn EventCallback; // 事件回调函数
     
   };
@@ -49,6 +50,9 @@ public:
   virtual void SetTitle(const std::string &title) = 0;
   virtual void SetCursorVisible(bool visible) = 0;
   virtual bool IsCursorVisible() const = 0;
+  virtual void SetWindowResizeable(bool resizeable) = 0;
+  virtual bool IsWindowResizeable() const = 0;
+  
 
   virtual void *GetNativeWindow() const = 0;
   virtual void *GetNativeContext() const = 0;

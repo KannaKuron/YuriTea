@@ -28,6 +28,8 @@ public:
   virtual void SetTitle(const std::string &title) override;
   virtual void SetCursorVisible(bool visible) override;
   virtual bool IsCursorVisible() const override;
+  virtual void SetWindowResizeable(bool resizeable) override;
+  virtual bool IsWindowResizeable() const override;
 
   virtual void *GetNativeWindow() const override { return m_Window; }
   virtual void *GetNativeContext() const override { return m_Context; }

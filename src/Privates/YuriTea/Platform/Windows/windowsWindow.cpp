@@ -1,6 +1,7 @@
 #include "YuriTea/Platform/Windows/windowsWindow.hpp"
 #include "YuriTea/Core/core.hpp"
 #include "YuriTea/Core/keyCodes.hpp"
+#include "YuriTea/Core/log.hpp"
 #include "YuriTea/Events/applicationEvent.hpp"
 #include "YuriTea/Events/keyEvent.hpp"
 #include "YuriTea/Events/mouseEvent.hpp"
@@ -9,10 +10,10 @@ namespace YuriTea {
 
 void WindowsWindow::OnUpdate() {
 
-  SDL_PumpEvents(); // 更新事件
-  glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-  glClear(GL_COLOR_BUFFER_BIT);
+
   SDL_GL_SwapWindow(m_Window);
+  
+  SDL_PumpEvents(); // 更新事件
 
 }
 
@@ -163,7 +164,7 @@ void WindowsWindow::SetEventFilters(){
           default: {
             UnKnownEvent e;
             callBack(e);
-            YT_CORE_WARN("未知窗口事件{0}", event->window.event);
+            YT_CORE_WARN("未知窗口事件{0} , {1}", event->window.event, event->type);
             return 0;
           }
         }
@@ -217,8 +218,7 @@ WindowsWindow::WindowsWindow(const WindowProps &props) {
 
 WindowsWindow::~WindowsWindow() {
   // 析构函数实现
-  YT_CORE_WARN("正在执行WindowsWindow析构函数");
-  YT_CORE_FLUSH();
+
   Shutdown();
   m_Context = nullptr;
   m_Window = nullptr;
@@ -229,9 +229,10 @@ void WindowsWindow::Init(const WindowProps &props) {
   // 初始化函数实现
   m_Data.Title = props.Title;
   m_Data.WindowSize = props.Size;
-  m_Data.VSync = false;
+  m_Data.VSync = true;
   m_Data.Fullscreen = false;
   m_Data.CursorVisible = true;
+  m_Data.WindowResizeable = true;
 
   YT_CORE_INFO("创建窗口 {0} ({1}, {2})", m_Data.Title, m_Data.WindowSize.x,
                m_Data.WindowSize.y);
@@ -309,6 +310,7 @@ void WindowsWindow::Init(const WindowProps &props) {
   SetFullscreen(m_Data.Fullscreen);
   SetCursorVisible(m_Data.CursorVisible);
   SetVSync(m_Data.VSync);
+  SetWindowResizeable(m_Data.WindowResizeable);
 
 }
 
@@ -374,6 +376,17 @@ void WindowsWindow::SetCursorVisible(bool visible) {
     SDL_ShowCursor(SDL_DISABLE);
   }
 }
+
+void WindowsWindow::SetWindowResizeable(bool resizeable) {
+  m_Data.WindowResizeable = resizeable;
+  if (m_Data.WindowResizeable) {
+    SDL_SetWindowResizable(m_Window, SDL_TRUE);
+  } else {
+    SDL_SetWindowResizable(m_Window, SDL_FALSE);
+  }
+}
+
+bool WindowsWindow::IsWindowResizeable() const { return m_Data.WindowResizeable; }
 
 bool WindowsWindow::IsCursorVisible() const { return m_Data.CursorVisible; }
 

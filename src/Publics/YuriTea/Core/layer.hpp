@@ -10,6 +10,10 @@ class YURITEA_API Layer {
 public:
   Layer(const std::string& name = "Layer"); // 构造函数
   virtual ~Layer(); // 析构函数
+
+  Layer(const Layer&) = delete; // 禁止复制构造函数
+  Layer& operator=(const Layer&) = delete; // 禁止复制赋值操作符
+  
     
   virtual void OnAttach() {}; // 当Layer被添加到LayerStack时调用
   virtual void OnDetach() {}; // 当Layer从LayerStack中移除时调用

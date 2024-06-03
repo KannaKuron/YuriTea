@@ -18,7 +18,6 @@ Application::Application() {
 
 Application::~Application() {
   // 析构函数实现
-  YT_CORE_INFO("Application Call Back Destructor 正在析构Application类");
   m_Window.reset();
   m_LayerStack.reset();
 
@@ -26,10 +25,13 @@ Application::~Application() {
 
 void Application::OnEvent(Event &e) {
   // 事件处理函数实现
-  YT_CORE_INFO("Application Call Back OnEvent ,the Event :{0}",e.ToString());
   EventDispatcher dispatcher(e);
-  if( dispatcher.Dispatch<WindowCloseEvent>(YT_BIND_EVENT_FN(Application::OnWindowClose)))
+  if( dispatcher.Dispatch<WindowCloseEvent>(YT_BIND_EVENT_FN(Application::OnWindowClose))){
+    YT_CORE_ERROR("WindowCloseEvent {0}",e.ToString());
+    //getsdl2Error();
+    YT_CORE_ERROR("The Error is {0}",SDL_GetError());
     return;
+  }
 
   // 逆序遍历LayerStack ,处理事件 保证先处理Overlay再处理Layer
   for (auto it = m_LayerStack->end(); it != m_LayerStack->begin();) {
@@ -42,23 +44,21 @@ void Application::OnEvent(Event &e) {
 
 
 void Application::Run() {
-  YT_CORE_INFO("Application Loop now is Running");
-  YT_CORE_INFO("m_Running {0}",m_Running);
   while (m_Running) {
     // 一直循环
-    for (Layer *layer : *m_LayerStack) {
-      layer->OnUpdate();
-    }
+    for(const auto& layer : *m_LayerStack)
+      layer.get()->OnUpdate();
     m_Window->OnUpdate();
   }
 }
+
 void Application::Start(Application *app) {
-  m_App.reset(app);
   m_App->Run();
 }
 
 int32 Application::Close(){
   //循环检查m_AllQuit是否为true 否则一直循环
+  YT_CORE_WARN("Application Closeing...");
 
   m_App.reset();
   return 0;
@@ -70,14 +70,12 @@ bool Application::OnWindowClose(WindowCloseEvent & e){
   return true;
 }
 
-void Application::PushLayer(Layer *layer){
-  m_LayerStack->PushLayer(layer);
-
+void Application::PushLayer(Layer*&& layer){
+  m_LayerStack->PushLayer(std::move(layer));
 }
 
-void Application::PushOverlay(Layer *overlay){
-  m_LayerStack->PushOverlay(overlay);
-
+void Application::PushOverlay(Layer*&& overlay){
+  m_LayerStack->PushOverlay(std::move(overlay));
 }
 
 

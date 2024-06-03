@@ -25,7 +25,7 @@ public:
 }
 
   EVENT_CLASS_TYPE(EventType::WindowResize)
-  EVENT_CLASS_CATEGORY(EventCategory::EventCategoryApplication)
+  EVENT_CLASS_CATEGORY(EventCategory::EventCategoryWindow)
 
 private:
   Vector2<uint32> m_Size;
@@ -41,10 +41,10 @@ class YURITEA_API WindowCloseEvent : public Event {
   }
 
   EVENT_CLASS_TYPE(EventType::WindowClose)
-  EVENT_CLASS_CATEGORY(EventCategory::EventCategoryApplication)
+  EVENT_CLASS_CATEGORY(EventCategory::EventCategoryWindow)
 };
 
-class YURITEA_API AppTerminateEvent : public Event {
+class YURITEA_API AppTerminateEvent : public Event { // 事件类 AppTerminateEvent 意思是 App 终止事件
   public:
     AppTerminateEvent() = default;
     virtual ~AppTerminateEvent() = default;
@@ -53,7 +53,7 @@ class YURITEA_API AppTerminateEvent : public Event {
   }
   
   EVENT_CLASS_TYPE(EventType::APPTERMINATE)
-  EVENT_CLASS_CATEGORY(EventCategory::EventCategoryApplication)
+  EVENT_CLASS_CATEGORY(EventCategory::EventCategoryApplication | EventCategory::EventCategoryWindow)
 };
 
 class YURITEA_API AppTickEvent : public Event {
@@ -93,7 +93,7 @@ class YURITEA_API WindowFocusEvent : public Event {
   }
   
   EVENT_CLASS_TYPE(EventType::WindowFocus)
-  EVENT_CLASS_CATEGORY(EventCategory::EventCategoryApplication)
+  EVENT_CLASS_CATEGORY(EventCategory::EventCategoryWindow)
 };
 
 class YURITEA_API WindowLostFocusEvent : public Event {
@@ -105,7 +105,7 @@ class YURITEA_API WindowLostFocusEvent : public Event {
   }
   
   EVENT_CLASS_TYPE(EventType::WindowLostFocus)
-  EVENT_CLASS_CATEGORY(EventCategory::EventCategoryApplication)
+  EVENT_CLASS_CATEGORY(EventCategory::EventCategoryWindow)
 };
 
 class YURITEA_API WindowMovedEvent : public Event {
@@ -125,7 +125,7 @@ class YURITEA_API WindowMovedEvent : public Event {
     return ss.str();
   }
   EVENT_CLASS_TYPE(EventType::WindowMoved)
-  EVENT_CLASS_CATEGORY(EventCategory::EventCategoryApplication)
+  EVENT_CLASS_CATEGORY(EventCategory::EventCategoryWindow)
 protected:
   Vector2<uint32> m_Position;
 };
@@ -139,7 +139,7 @@ class YURITEA_API WindowMinimizedEvent : public Event {
   }
   
   EVENT_CLASS_TYPE(EventType::WindowMinimized)
-  EVENT_CLASS_CATEGORY(EventCategory::EventCategoryApplication)
+  EVENT_CLASS_CATEGORY(EventCategory::EventCategoryWindow)
 };
 
 
@@ -153,7 +153,7 @@ class YURITEA_API WindowMaximizedEvent : public Event {
   }
   
   EVENT_CLASS_TYPE(EventType::WindowMaximized)
-  EVENT_CLASS_CATEGORY(EventCategory::EventCategoryApplication)
+  EVENT_CLASS_CATEGORY(EventCategory::EventCategoryWindow)
 };
 
 class YURITEA_API WindowShowEvent : public Event {
@@ -165,7 +165,7 @@ class YURITEA_API WindowShowEvent : public Event {
   }
   
   EVENT_CLASS_TYPE(EventType::WindowShown)
-  EVENT_CLASS_CATEGORY(EventCategory::EventCategoryApplication)
+  EVENT_CLASS_CATEGORY(EventCategory::EventCategoryWindow)
 };
 
 class YURITEA_API WindowHideEvent : public Event {
@@ -177,7 +177,7 @@ class YURITEA_API WindowHideEvent : public Event {
   }
   
   EVENT_CLASS_TYPE(EventType::WindowHidden)
-  EVENT_CLASS_CATEGORY(EventCategory::EventCategoryApplication)
+  EVENT_CLASS_CATEGORY(EventCategory::EventCategoryWindow)
 };
 
 class YURITEA_API WindowEnterEvent : public Event {
@@ -188,7 +188,7 @@ class YURITEA_API WindowEnterEvent : public Event {
     return "WindowEnterEvent";
   }
   EVENT_CLASS_TYPE(EventType::WindowEnter)
-  EVENT_CLASS_CATEGORY(EventCategory::EventCategoryApplication)
+  EVENT_CLASS_CATEGORY(EventCategory::EventCategoryWindow)
 };
 
 class YURITEA_API WindowLeaveEvent : public Event {
@@ -200,7 +200,7 @@ class YURITEA_API WindowLeaveEvent : public Event {
   }
   
   EVENT_CLASS_TYPE(EventType::WindowLeave)
-  EVENT_CLASS_CATEGORY(EventCategory::EventCategoryApplication)
+  EVENT_CLASS_CATEGORY(EventCategory::EventCategoryWindow)
 };
 
 
@@ -213,7 +213,7 @@ class YURITEA_API WindowExposedEvent : public Event {
   }
   
   EVENT_CLASS_TYPE(EventType::WindowExposed)
-  EVENT_CLASS_CATEGORY(EventCategory::EventCategoryApplication)
+  EVENT_CLASS_CATEGORY(EventCategory::EventCategoryWindow)
 };
 
 class YURITEA_API WindowRestoredEvent : public Event {
@@ -225,7 +225,7 @@ class YURITEA_API WindowRestoredEvent : public Event {
   }
   
   EVENT_CLASS_TYPE(EventType::WindowRestored)
-  EVENT_CLASS_CATEGORY(EventCategory::EventCategoryApplication)
+  EVENT_CLASS_CATEGORY(EventCategory::EventCategoryWindow)
 };
 
 

@@ -17,11 +17,15 @@ public:
   void OnUpdate() override; // 每帧调用
   void OnEvent(Event& event) override; // 事件处理
 
+private:
+  bool OnMouseEvent(Event&);
+  bool OnKeyEvent(Event&);
+  bool OnCharEvent(Event&);
+  bool OnWindowEvent(Event&);
   
   
 
 private:
-  ImGuiIO* io; 
   float32 m_Time = 0.0f;
 
 

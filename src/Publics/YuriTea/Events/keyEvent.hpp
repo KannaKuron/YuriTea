@@ -1,4 +1,5 @@
 #pragma once
+#include "YuriTea/Core/base.hpp"
 #include "YuriTea/Core/keyCodes.hpp"
 #include "YuriTea/Events/event.hpp"
 
@@ -37,7 +38,7 @@ public:
 
   std::string ToString() const override {
     std::stringstream ss;
-    ss << "KeyPressedEvent: " << m_KeyCode << "KeyModif: " << m_Mod << " ("
+    ss << "KeyPressedEvent: " << m_KeyCode << " ,KeyModif: " << m_Mod << " ("
        << m_RepeatCount << " repeats)";
     return ss.str();
   }
@@ -77,7 +78,7 @@ public:
 
   EVENT_CLASS_TYPE(EventType::TextInput)
   EVENT_CLASS_CATEGORY(EventCategory::EventCategoryKeyboard |
-                       EventCategory::EventCategoryInput)
+                      EventCategory::EventCategoryInput | EventCategory::EventCategoryTextInput)
 
 protected:
   std::string m_Text;
@@ -99,7 +100,7 @@ public:
     }
     EVENT_CLASS_TYPE(EventType::TextEditing)
     EVENT_CLASS_CATEGORY(EventCategory::EventCategoryKeyboard |
-                         EventCategory::EventCategoryInput)
+                        EventCategory::EventCategoryInput | EventCategory::EventCategoryTextInput)
 
 protected:
     std::string m_Text;
@@ -118,11 +119,11 @@ public:
       return ss.str();
     }
     EVENT_CLASS_TYPE(EventType::ClipboardChanged)
-    EVENT_CLASS_CATEGORY(EventCategory::EventCategoryKeyboard |
-                         EventCategory::EventCategoryInput)
+    EVENT_CLASS_CATEGORY(EventCategory::EventCategoryInput | EventCategory::EventCategoryTextInput)
 protected:
   
 
 };
+
 
 } // namespace YuriTea
