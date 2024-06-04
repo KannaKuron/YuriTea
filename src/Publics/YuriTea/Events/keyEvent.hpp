@@ -111,8 +111,13 @@ protected:
 
 class YURITEA_API ClipboardChangedEvent : public Event {
 public:
-    ClipboardChangedEvent() = default;
+    ClipboardChangedEvent(const std::string &text, int start, int length)
+      : m_Text(text), m_Start(start), m_Length(length) {}
     ~ClipboardChangedEvent() = default;
+    const std::string &GetText() const { return m_Text; }
+    const int &GetStart() const { return m_Start; }
+    const int &GetLength() const { return m_Length; }
+
     std::string ToString() const override {
       std::stringstream ss;
       ss << "ClipboardChangedEvent";
@@ -121,6 +126,10 @@ public:
     EVENT_CLASS_TYPE(EventType::ClipboardChanged)
     EVENT_CLASS_CATEGORY(EventCategory::EventCategoryInput | EventCategory::EventCategoryTextInput)
 protected:
+  std::string m_Text;
+  int m_Start;
+  int m_Length;
+
   
 
 };

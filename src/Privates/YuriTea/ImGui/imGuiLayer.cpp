@@ -1,4 +1,5 @@
 #include "YuriTea/ImGui/imGuiLayer.hpp"
+#include "YuriTea/Core/basicstruct.hpp"
 #include "YuriTea/Core/keyCodes.hpp"
 #include "YuriTea/Core/window.hpp"
 #include "YuriTea/Events/applicationEvent.hpp"
@@ -78,9 +79,15 @@ void ImGuiLayer::OnUpdate(){
 
 void ImGuiLayer::OnEvent(Event& event){
   EventDispatcher dispatcher(event);
+  if(event.GetCategoryFlags() & EventCategory::EventCategoryTextInput){
+    dispatcher.Dispatch<TextInputEvent>(YT_BIND_EVENT_FN(ImGuiLayer::OnCharEvent));
+    // dispatcher.Dispatch<TextEditingEvent>(YT_BIND_EVENT_FN(ImGuiLayer::OnCharEvent));
+    dispatcher.Dispatch<ClipboardChangedEvent>(YT_BIND_EVENT_FN(ImGuiLayer::OnCharEvent));
+    return;
+  }else
   if(event. GetCategoryFlags() & EventCategory::EventCategoryKeyboard){
-    //dispatcher.Dispatch<KeyPressedEvent>(YT_BIND_EVENT_FN(ImGuiLayer::OnKeyEvent));
-    //dispatcher.Dispatch<KeyReleasedEvent>(YT_BIND_EVENT_FN(ImGuiLayer::OnKeyEvent));
+    dispatcher.Dispatch<KeyPressedEvent>(YT_BIND_EVENT_FN(ImGuiLayer::OnKeyEvent));
+    dispatcher.Dispatch<KeyReleasedEvent>(YT_BIND_EVENT_FN(ImGuiLayer::OnKeyEvent));
     return;
   }else
   if(event.GetCategoryFlags() & EventCategory::EventCategoryMouse || event.GetCategoryFlags() & EventCategory::EventCategoryMouseButton){
@@ -93,12 +100,6 @@ void ImGuiLayer::OnEvent(Event& event){
   if(event.GetCategoryFlags() & EventCategory::EventCategoryWindow){
     dispatcher.Dispatch<WindowResizeEvent>(YT_BIND_EVENT_FN(ImGuiLayer::OnWindowEvent));
    // dispatcher.Dispatch<WindowLeaveEvent>(YT_BIND_EVENT_FN(ImGuiLayer::OnWindowEvent));
-    return;
-  }else
-  if(event.GetCategoryFlags() & EventCategory::EventCategoryTextInput){
-    dispatcher.Dispatch<TextInputEvent>(YT_BIND_EVENT_FN(ImGuiLayer::OnCharEvent));
-    dispatcher.Dispatch<TextEditingEvent>(YT_BIND_EVENT_FN(ImGuiLayer::OnCharEvent));
-    dispatcher.Dispatch<ClipboardChangedEvent>(YT_BIND_EVENT_FN(ImGuiLayer::OnCharEvent));
     return;
   }
 }
@@ -128,10 +129,6 @@ bool ImGuiLayer::OnMouseEvent(Event& event){
     if(keymod & KeyMod::YRT_KMOD_GUI)
       io.KeySuper = true;
 
-    std::string keymod_str {(char*)YT_TOBITS(keymod)};
-
-    YT_CORE_INFO("KeyMod {0},{1} ", keymod_str,(uint32)keymod); 
-    //in 16 jinzhi
 
     return false;
   }
@@ -162,12 +159,14 @@ bool ImGuiLayer::OnKeyEvent(Event& event){
   auto& io = ImGui::GetIO();
   if(event.GetEventType() == EventType::KeyPressed){
     KeyPressedEvent& e = static_cast<KeyPressedEvent&>(event);
-    io.KeysDown[e.GetKeyCode()] = true;
+    
+
     return false;
   }
   if(event.GetEventType() == EventType::KeyReleased){
     KeyReleasedEvent& e = static_cast<KeyReleasedEvent&>(event);
-    io.KeysDown[e.GetKeyCode()] = false;
+    
+
     return false;
   }
 
@@ -177,6 +176,22 @@ bool ImGuiLayer::OnKeyEvent(Event& event){
 }
 
 bool ImGuiLayer::OnCharEvent(Event& event) {
+  auto& io = ImGui::GetIO();
+  if(event.GetEventType() == EventType::TextInput){
+    TextInputEvent& e = static_cast<TextInputEvent&>(event);
+    io.AddInputCharactersUTF8(e.GetText().c_str());
+    return false;
+  }
+  if(event.GetEventType() == EventType::TextEditing){
+    TextEditingEvent& e = static_cast<TextEditingEvent&>(event);
+    io.AddInputCharactersUTF8(e.GetText().c_str());
+    return false;
+  }
+  if(event.GetEventType() == EventType::ClipboardChanged){
+    ClipboardChangedEvent& e = static_cast<ClipboardChangedEvent&>(event);
+    io.SetClipboardTextFn(nullptr,e.GetText().c_str());
+    return false;
+  }
 
   return false;
 }

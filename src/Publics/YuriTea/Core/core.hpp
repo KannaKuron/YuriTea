@@ -43,6 +43,7 @@
 #include "YuriTea/Events/applicationEvent.hpp"
 #include "YuriTea/Events/keyEvent.hpp"
 #include "YuriTea/Events/mouseEvent.hpp"
+#include "YuriTea/Core/input.hpp"
 
 #ifdef YuriTea_Platform_Windows
 #include <Windows.h>

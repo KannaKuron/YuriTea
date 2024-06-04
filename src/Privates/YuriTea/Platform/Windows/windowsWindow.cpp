@@ -182,7 +182,11 @@ void WindowsWindow::SetEventFilters(){
       return 0;
     }
     case SDL_CLIPBOARDUPDATE: {
-      ClipboardChangedEvent e;
+      YT_CORE_INFO("Clipboard changed");
+      auto text = SDL_GetClipboardText();
+      auto len = SDL_strlen(text);
+      auto text_ = std::string(text, len);
+      ClipboardChangedEvent e(text_, 0, len);
       callBack(e);
       return 0;
     }

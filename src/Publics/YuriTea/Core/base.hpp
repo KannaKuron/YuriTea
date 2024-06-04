@@ -36,14 +36,15 @@
 #endif
 
 template<typename T>
-const char* __ToBits(const T& x){
-  int32 size = sizeof(x) *8;
-  char buf[size+1];
+std::string __ToBits(const T& x){
+  constexpr int32 size = sizeof(T) *8;
+  std::string buf(size, '0');
   for (int i = 0 ;i < size; i++){
-    buf[i] = x & BIT(i) ? '1' : '0';
+    buf[size-1-i] = x & BIT(i) ? '1' : '0';
   }
   buf[size] = '\0';
   return buf;
 }
 
 #define YT_TOBITS(x) __ToBits(x)
+
