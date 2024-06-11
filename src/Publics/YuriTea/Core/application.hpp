@@ -1,9 +1,5 @@
 #pragma once
 #include "YuriTea/Core/core.hpp"
-#include "YuriTea/Core/window.hpp"
-#include "YuriTea/Events/applicationEvent.hpp"
-#include "YuriTea/Events/keyEvent.hpp"
-#include "YuriTea/Events/mouseEvent.hpp"
 #include "YuriTea/Core/layerStack.hpp"
 
 
@@ -17,9 +13,10 @@ public:
 
   static void Start(Application *);
   static int32 Close();
-  static Application *Get() { return m_App.get(); }
 
-  Window* GetWindow() { return m_Window.get(); }
+  static const Application *Get() { return m_App.get(); }
+
+  Window* GetWindow() const { return m_Window.get(); }
 
   void Run();
   void OnEvent(Event &);

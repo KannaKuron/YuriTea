@@ -9,24 +9,28 @@ namespace YuriTea {
 class YURITEA_API ImGuiLayer : public Layer {
 public:
   ImGuiLayer();
-  ~ImGuiLayer();
+  ~ImGuiLayer() = default;
 
-  void OnAttach() override; // 当Layer被添加到LayerStack时调用
-  void OnDetach() override; // 当Layer从LayerStack中移除时调用
+  virtual void OnAttach() override; // 当Layer被添加到LayerStack时调用
+  virtual void OnDetach() override; // 当Layer从LayerStack中移除时调用
 
-  void OnUpdate() override; // 每帧调用
-  void OnEvent(Event& event) override; // 事件处理
+  virtual void OnEvent(Event& event) override;
+
+  virtual void OnUpdate() override;
+
+
+
+  virtual void Begin();
+  virtual void End();
+
+  uint32 GetActiveWidgetID() const;
+  
+	void SetDarkThemeColors();
+  
+  void BlockEvents(bool block) { m_BlockEvents = block; }
 
 private:
-  bool OnMouseEvent(Event&);
-  bool OnKeyEvent(Event&);
-  bool OnCharEvent(Event&);
-  bool OnWindowEvent(Event&);
-  
-  
-
-private:
-  float32 m_Time = 0.0f;
+  bool m_BlockEvents = true;
 
 
 

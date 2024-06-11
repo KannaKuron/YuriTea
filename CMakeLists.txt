@@ -1,13 +1,25 @@
 #要求cmake的最低版本 3.20
 cmake_minimum_required(VERSION 3.20.0)
 
-if(WIN32)
-set(CMAKE_C_COMPILER "C:/Program Files/LLVM/bin/clang.exe" CACHE STRING "")
-set(CMAKE_CXX_COMPILER "C:/Program Files/LLVM/bin/clang++.exe" CACHE STRING "")
+set(CMAKE_GENERATOR "Ninja Multi-Config" CACHE INTERNAL "" FORCE)
+
+set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/build)
+
+find_program(CCACHE_PROGRAM ccache)
+
+if(CCACHE_PROGRAM)
+  message(STATUS "Setup ccache for the project.")
+  message(STATUS "Found ccache: ${CCACHE_PROGRAM}")
+  set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
+  set(CMAKE_C_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
+  set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
 else()
-set(CMAKE_C_COMPILER "clang" CACHE STRING "")
-set(CMAKE_CXX_COMPILER "clang++" CACHE STRING "")
+  message(STATUS "ccache not found.")
 endif()
+
+set(CMAKE_CXX_COMPILER clang++)
+set(CMAKE_C_COMPILER clang)
+
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -18,7 +30,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project(YuriTeaTest LANGUAGES CXX)
 
+set(PUBLICS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/Publics)
+set(DEPENDENCIES_HEADERS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/vendor/include)
+
+
 set(YURITEA_DLL_PATH "${CMAKE_CURRENT_SOURCE_DIR}\\src\\lib\\Debug")
+
 
 add_executable(${PROJECT_NAME}
   ./SandBox.cpp
@@ -28,6 +45,9 @@ if(WIN32)
 target_compile_definitions(${PROJECT_NAME} PRIVATE YuriTea_Platform_Windows)
 endif()
 
+target_compile_definitions(${PROJECT_NAME} PRIVATE YuriTeaEngine)
+target_compile_definitions(${PROJECT_NAME} PRIVATE YuriTea_Graphics_API_OpenGL)
+
 target_compile_definitions(${PROJECT_NAME}
   PRIVATE $<$<CONFIG:Debug>:YuriTea_DEBUG>
   PRIVATE $<$<CONFIG:Debug>:YuriTea_ENABLE_ASSERTS>
@@ -36,12 +56,10 @@ target_compile_definitions(${PROJECT_NAME}
 
 # 添加头文件目录
 target_include_directories(${PROJECT_NAME} PRIVATE 
-  src/Publics
-  src/vendor/include
+  ${PUBLICS_DIR}
+  ${DEPENDENCIES_HEADERS_DIR}
 )
 
-
-if(WIN32)
 
 # 链接动态导入库
 find_library(YURITEA YuriTea HINTS "${YURITEA_DLL_PATH}")
@@ -96,4 +114,4 @@ add_custom_target(copy_files ALL
 # 确保在每次构建时都执行 copy_files 目标
 set_target_properties(copy_files PROPERTIES EXCLUDE_FROM_DEFAULT_BUILD FALSE)
 
-endif()
+

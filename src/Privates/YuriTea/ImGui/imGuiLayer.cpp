@@ -1,13 +1,7 @@
 #include "YuriTea/ImGui/imGuiLayer.hpp"
-#include "YuriTea/Core/basicstruct.hpp"
-#include "YuriTea/Core/keyCodes.hpp"
-#include "YuriTea/Core/window.hpp"
-#include "YuriTea/Events/applicationEvent.hpp"
-#include "YuriTea/Events/keyEvent.hpp"
+#include "YuriTea/Core/base.hpp"
+#include "YuriTea/Platform/Windows/windowsWindow.hpp"
 #include "imgui/imgui.h"
-#include "imgui/imgui_impl_sdl2.h"
-#include "imgui/imgui_impl_opengl3.h"
-#include "YuriTea/Core/application.hpp"
 
 
 
@@ -16,29 +10,50 @@ namespace YuriTea {
 ImGuiLayer::ImGuiLayer()
     : Layer("ImGuiLayer")  {
 
-
-
 }
 
-ImGuiLayer::~ImGuiLayer(){
-
-}
 
 void ImGuiLayer::OnAttach(){
+
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
   auto& io = ImGui::GetIO(); 
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-  io.ConfigFlags |= ImGuiBackendFlags_HasMouseCursors;      // Enable Mouse Cursors
-  io.ConfigFlags |= ImGuiBackendFlags_HasSetMousePos;       // Enable SetMousePos
+  io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
+  io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
+
+  io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;      // Enable Mouse Cursors
+  io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;       // Enable SetMousePos
+
   
+
+  float32 font_size = 16.0f;
+
+#ifdef Yuritea_Release
+  io.Fonts->AddFontFromFileTTF("assets/fonts/Roboto-Medium.ttf", font_size);
+  io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/Roboto-Medium.ttf", font_size);
+#endif
+
   ImGui::StyleColorsDark();
+
   void* window = Application::Get()->GetWindow()->GetNativeWindow();
   void* gl_context = Application::Get()->GetWindow()->GetNativeContext();
+
+  ImGuiStyle& style = ImGui::GetStyle();
+
+  if(io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable){
+    // 窗口圆角半径
+    style.WindowRounding = 0.0f;
+    // 窗口背景透明度
+    style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+
+  }
+
+	SetDarkThemeColors();
+
   ImGui_ImplSDL2_InitForOpenGL(static_cast<SDL_Window*>(window), gl_context);
   ImGui_ImplOpenGL3_Init("#version 460");
-
 
 }
 
@@ -50,179 +65,99 @@ void ImGuiLayer::OnDetach(){
 
 }
 
+void ImGuiLayer::OnEvent(Event& event) {
+
+  ImGui_ImplSDL2_YuriTea_ProcessEvent(&event);
+
+  if(m_BlockEvents){
+    ImGuiIO& io = ImGui::GetIO();
+    event |= event.IsInCategory(EventCategoryMouse) & io.WantCaptureMouse;
+    event |= event.IsInCategory(EventCategoryMouseButton) & io.WantCaptureKeyboard;
+    event |= event.IsInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;
+
+  }
+}
+
+
+
+void ImGuiLayer::Begin(){
+  ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplSDL2_NewFrame();
+	ImGui::NewFrame();
+
+}
+
+void ImGuiLayer::End(){
+
+  ImGuiIO& io = ImGui::GetIO();
+  const Application* app = Application::Get();
+  auto window = app->GetWindow();
+
+  io.DisplaySize = ImVec2(window->GetWidth(), window->GetHeight());
+
+  ImGui::Render();
+  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+
+  if(io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable){
+    SDL_Window* backup_current_window = SDL_GL_GetCurrentWindow();
+    SDL_GLContext backup_current_context = SDL_GL_GetCurrentContext();
+    ImGui::UpdatePlatformWindows();
+    ImGui::RenderPlatformWindowsDefault();
+    SDL_GL_MakeCurrent(backup_current_window, backup_current_context);
+  }
+
+  //  ImGui::EndFrame();
+}
 
 
 void ImGuiLayer::OnUpdate(){
-  ImGui_ImplSDL2_NewFrame();
-  ImGui_ImplOpenGL3_NewFrame();
-  ImGui::NewFrame();
-
+  Begin();
   static bool show = true;
-
+  //show demo window
+  
   ImGui::ShowDemoWindow(&show);
-  auto& io = ImGui::GetIO();
 
-  float time = (float)SDL_GetTicks();
-  io.DeltaTime = m_Time > 0.0 ? (time - m_Time) / 1000.0 : (1.0f / 60.0f);
-  m_Time = time;
+  
 
-
-  ImGui::Render();
-  Window* window = Application::Get()->GetWindow();
-  WindowData* m_Data = static_cast<WindowData*>(window->GetNativeData());
-  glViewport(0,0,m_Data->WindowSize.x,m_Data->WindowSize.y);
-  glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-  glClear(GL_COLOR_BUFFER_BIT);
-  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
+  End();
 }
 
-void ImGuiLayer::OnEvent(Event& event){
-  EventDispatcher dispatcher(event);
-  if(event.GetCategoryFlags() & EventCategory::EventCategoryTextInput){
-    dispatcher.Dispatch<TextInputEvent>(YT_BIND_EVENT_FN(ImGuiLayer::OnCharEvent));
-    // dispatcher.Dispatch<TextEditingEvent>(YT_BIND_EVENT_FN(ImGuiLayer::OnCharEvent));
-    dispatcher.Dispatch<ClipboardChangedEvent>(YT_BIND_EVENT_FN(ImGuiLayer::OnCharEvent));
-    return;
-  }else
-  if(event. GetCategoryFlags() & EventCategory::EventCategoryKeyboard){
-    dispatcher.Dispatch<KeyPressedEvent>(YT_BIND_EVENT_FN(ImGuiLayer::OnKeyEvent));
-    dispatcher.Dispatch<KeyReleasedEvent>(YT_BIND_EVENT_FN(ImGuiLayer::OnKeyEvent));
-    return;
-  }else
-  if(event.GetCategoryFlags() & EventCategory::EventCategoryMouse || event.GetCategoryFlags() & EventCategory::EventCategoryMouseButton){
-    dispatcher.Dispatch<MouseMovedEvent>(YT_BIND_EVENT_FN(ImGuiLayer::OnMouseEvent));
-    dispatcher.Dispatch<MouseButtonPressedEvent>(YT_BIND_EVENT_FN(ImGuiLayer::OnMouseEvent));
-    dispatcher.Dispatch<MouseButtonReleasedEvent>(YT_BIND_EVENT_FN(ImGuiLayer::OnMouseEvent));
-    dispatcher.Dispatch<MouseScrolledEvent>(YT_BIND_EVENT_FN(ImGuiLayer::OnMouseEvent));
-    return;
-  }else
-  if(event.GetCategoryFlags() & EventCategory::EventCategoryWindow){
-    dispatcher.Dispatch<WindowResizeEvent>(YT_BIND_EVENT_FN(ImGuiLayer::OnWindowEvent));
-   // dispatcher.Dispatch<WindowLeaveEvent>(YT_BIND_EVENT_FN(ImGuiLayer::OnWindowEvent));
-    return;
-  }
+void ImGuiLayer::SetDarkThemeColors(){
+
+		auto& colors = ImGui::GetStyle().Colors;
+		colors[ImGuiCol_WindowBg] = ImVec4{ 0.1f, 0.105f, 0.11f, 1.0f };
+
+		// Headers
+		colors[ImGuiCol_Header] = ImVec4{ 0.2f, 0.205f, 0.21f, 1.0f };
+		colors[ImGuiCol_HeaderHovered] = ImVec4{ 0.3f, 0.305f, 0.31f, 1.0f };
+		colors[ImGuiCol_HeaderActive] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
+		
+		// Buttons
+		colors[ImGuiCol_Button] = ImVec4{ 0.2f, 0.205f, 0.21f, 1.0f };
+		colors[ImGuiCol_ButtonHovered] = ImVec4{ 0.3f, 0.305f, 0.31f, 1.0f };
+		colors[ImGuiCol_ButtonActive] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
+
+		// Frame BG
+		colors[ImGuiCol_FrameBg] = ImVec4{ 0.2f, 0.205f, 0.21f, 1.0f };
+		colors[ImGuiCol_FrameBgHovered] = ImVec4{ 0.3f, 0.305f, 0.31f, 1.0f };
+		colors[ImGuiCol_FrameBgActive] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
+
+		// Tabs
+		colors[ImGuiCol_Tab] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
+		colors[ImGuiCol_TabHovered] = ImVec4{ 0.38f, 0.3805f, 0.381f, 1.0f };
+		colors[ImGuiCol_TabActive] = ImVec4{ 0.28f, 0.2805f, 0.281f, 1.0f };
+		colors[ImGuiCol_TabUnfocused] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
+		colors[ImGuiCol_TabUnfocusedActive] = ImVec4{ 0.2f, 0.205f, 0.21f, 1.0f };
+
+		// Title
+		colors[ImGuiCol_TitleBg] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
+		colors[ImGuiCol_TitleBgActive] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
+		colors[ImGuiCol_TitleBgCollapsed] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
 }
 
-
-bool ImGuiLayer::OnMouseEvent(Event& event){
-  //区别是MouseButtonPressedEvent和MouseButtonReleasedEvent
-  auto& io = ImGui::GetIO();
-  if(event.GetEventType() == EventType::MouseMoved){
-    MouseMovedEvent& e = static_cast<MouseMovedEvent&>(event);
-    auto [x,y] = e.GetPosition();
-    io.MousePos = ImVec2(x,y);
-    return false;
-  }
-  if(event.GetEventType() == EventType::MouseButtonPressed){
-    MouseButtonPressedEvent& e = static_cast<MouseButtonPressedEvent&>(event);
-    io.MouseDown[e.GetButton()-1] = true;
-
-    const auto& keymod = e.GetModifiers();
-
-    if(keymod & KeyMod::YRT_KMOD_SHIFT)
-      io.KeyShift = true;
-    if(keymod & KeyMod::YRT_KMOD_CTRL)
-      io.KeyCtrl = true;
-    if(keymod & KeyMod::YRT_KMOD_ALT)
-      io.KeyAlt = true;
-    if(keymod & KeyMod::YRT_KMOD_GUI)
-      io.KeySuper = true;
-
-
-    return false;
-  }
-  if(event.GetEventType() == EventType::MouseButtonReleased){
-    MouseButtonReleasedEvent& e = static_cast<MouseButtonReleasedEvent&>(event);
-    io.MouseDown[e.GetButton()-1] = false;
-    return false;
-  }
-  if(event.GetEventType() == EventType::MouseScrolled){
-    MouseScrolledEvent& e = static_cast<MouseScrolledEvent&>(event);
-    auto [x,y] = e.GetOffset();
-    io.MouseWheel += y;
-    io.MouseWheelH += x;
-    return false;
-  }
-  if(event.GetEventType() == EventType::MouseMoved){
-    MouseMovedEvent& e = static_cast<MouseMovedEvent&>(event);
-    auto [x,y] = e.GetPosition();
-    io.MousePos = ImVec2(x,y);
-    return false;
-  }
-  YT_CORE_WARN("Event type not supported by ImGuiLayer , OnMouseEvent");
-
-  return false;
+uint32 ImGuiLayer::GetActiveWidgetID() const {
+  return ImGui::GetActiveID();
 }
 
-bool ImGuiLayer::OnKeyEvent(Event& event){
-  auto& io = ImGui::GetIO();
-  if(event.GetEventType() == EventType::KeyPressed){
-    KeyPressedEvent& e = static_cast<KeyPressedEvent&>(event);
-    
-
-    return false;
-  }
-  if(event.GetEventType() == EventType::KeyReleased){
-    KeyReleasedEvent& e = static_cast<KeyReleasedEvent&>(event);
-    
-
-    return false;
-  }
-
-  YT_CORE_WARN("Event type not supported by ImGuiLayer , OnKeyEvent");
-
-  return false;
 }
-
-bool ImGuiLayer::OnCharEvent(Event& event) {
-  auto& io = ImGui::GetIO();
-  if(event.GetEventType() == EventType::TextInput){
-    TextInputEvent& e = static_cast<TextInputEvent&>(event);
-    io.AddInputCharactersUTF8(e.GetText().c_str());
-    return false;
-  }
-  if(event.GetEventType() == EventType::TextEditing){
-    TextEditingEvent& e = static_cast<TextEditingEvent&>(event);
-    io.AddInputCharactersUTF8(e.GetText().c_str());
-    return false;
-  }
-  if(event.GetEventType() == EventType::ClipboardChanged){
-    ClipboardChangedEvent& e = static_cast<ClipboardChangedEvent&>(event);
-    io.SetClipboardTextFn(nullptr,e.GetText().c_str());
-    return false;
-  }
-
-  return false;
-}
-
-bool ImGuiLayer::OnWindowEvent(Event& event) {
-  auto& io = ImGui::GetIO();
-  if(event.GetEventType() == EventType::WindowResize){
-    auto& e = static_cast<WindowResizeEvent&>(event);
-    auto [width,height] = e.GetSize();
-    io.DisplaySize = ImVec2(width,height);
-    io.DisplayFramebufferScale = ImVec2(1.0f,1.0f);
-    
-
-    return false;
-  }
-  if(event.GetEventType() == EventType::WindowLeave){
-    io.MouseDown[0] = false;
-    io.MouseDown[1] = false;
-    // stop moving and input
-    io.MousePos = ImVec2(-FLT_MAX,-FLT_MAX);
-    io.MousePosPrev = ImVec2(-FLT_MAX,-FLT_MAX);
-    io.MouseDragThreshold = 0.0f; // stop dragging
-    io.MouseWheel = 0.0f;
-    io.MouseWheelH = 0.0f;
-
-    return false;
-  }
-
-  YT_CORE_WARN("Event type not supported by ImGuiLayer , OnWindowEvent");
-
-  return false;
-}
-
-};

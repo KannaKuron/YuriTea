@@ -1,10 +1,4 @@
 #include "YuriTea/Platform/Windows/windowsWindow.hpp"
-#include "YuriTea/Core/core.hpp"
-#include "YuriTea/Core/keyCodes.hpp"
-#include "YuriTea/Core/log.hpp"
-#include "YuriTea/Events/applicationEvent.hpp"
-#include "YuriTea/Events/keyEvent.hpp"
-#include "YuriTea/Events/mouseEvent.hpp"
 
 namespace YuriTea {
 
@@ -19,11 +13,14 @@ void WindowsWindow::OnUpdate() {
 
 void WindowsWindow::SetEventFilters(){
   // 设置关闭窗口事件
-  SDL_SetEventFilter([](void * data_t,SDL_Event* event)->int{
+  SDL_SetEventFilter([](void * data_t,SDL_Event* event_p)->int{
     auto callBack = static_cast<WindowData*>(data_t)->EventCallback;
-    switch (event->type) {
+
+    const auto& event= *event_p;
+    const auto& type = event.type;
+    switch (type) {
       case SDL_QUIT: {
-        WindowCloseEvent e;
+        AppTerminateEvent e;
         callBack(e);
         return 0;
       }
@@ -36,15 +33,12 @@ void WindowsWindow::SetEventFilters(){
       // * Keyboard Events * //
       case SDL_KEYDOWN :{
         //  KeyPressedEvent(KeyCode code, KeyMod mod, uint32 repeatCount)
-        KeyPressedEvent e(static_cast<KeyCode>(event->key.keysym.sym),
-                          static_cast<KeyMod>(event->key.keysym.mod),
-                          event->key.repeat);
+        KeyPressedEvent e(event);
         callBack(e);
         return 0;
       }
       case SDL_KEYUP :{
-        KeyReleasedEvent e(static_cast<KeyCode>(event->key.keysym.sym),
-                      static_cast<KeyMod>(event->key.keysym.mod));
+        KeyReleasedEvent e(event);
         callBack(e);
         return 0;
       }
@@ -54,145 +48,157 @@ void WindowsWindow::SetEventFilters(){
         //  MouseMovedEvent(Vector2<float32> position, Vector2<float32> lastPosition,uint32 timeStamp, uint32 state, uint32 keyMod)
         // 这时候的键盘状态
         auto mod = SDL_GetModState();
-        MouseMovedEvent e(event->motion.x, event->motion.y,
-                          event->motion.xrel, event->motion.yrel,
-                          event->motion.timestamp,
-                          event->motion.state,
-                          static_cast<KeyMod>(mod));
+        MouseMovedEvent e(event, static_cast<KeyMod>(mod));
+
+        if (event.motion.which == SDL_TOUCH_MOUSEID) {
+          e.SetMouseMoved(false);
+        }
         callBack(e);
         return 0;
       }
       case SDL_MOUSEBUTTONDOWN :{
         //  MouseButtonPressedEvent(MouseCode button, KeyMod modifiers, uint32 repeatCount, float32 x, float32 y, uint32 timeStamp)
         auto mod = SDL_GetModState();
-        MouseButtonPressedEvent e(static_cast<MouseCode>(event->button.button),
-                            static_cast<KeyMod>(mod),
-                            event->button.clicks,
-                            static_cast<float32>(event->button.x), static_cast<float32>(event->button.y),
-                            event->button.timestamp);
+        MouseButtonPressedEvent e(event, static_cast<KeyMod>(mod));
+
+        if (event.button.which == SDL_TOUCH_MOUSEID) {
+          e.SetMouseMoved(false);
+        }
         callBack(e);
         return 0;
       }
       case SDL_MOUSEBUTTONUP :{
         //  MouseButtonReleasedEvent(MouseCode button, KeyMod modifiers, float32 x, float32 y, uint32 timeStamp)
         auto mod = SDL_GetModState();
-        MouseButtonReleasedEvent e(static_cast<MouseCode>(event->button.button),
-                      static_cast<KeyMod>(mod),
-                      static_cast<float32>(event->button.x), static_cast<float32>(event->button.y),
-                      event->button.timestamp);
+        MouseButtonReleasedEvent e(event, static_cast<KeyMod>(mod));
+
+        if (event.button.which == SDL_TOUCH_MOUSEID) {
+          e.SetMouseMoved(false);
+        }
+
         callBack(e);
         return 0;
       }
       case SDL_MOUSEWHEEL :{
         //MouseScrolledEvent(float32 positionX, float32 positionY, float32 offsetX, float32 offsetY, uint32 timeStamp, KeyMod modifiers)
         auto mod = SDL_GetModState();
-        MouseScrolledEvent e(static_cast<float32>(event->wheel.mouseX),static_cast<float32>( event->wheel.mouseY),
-                            static_cast<float32>(event->wheel.x),static_cast<float32>(event->wheel.y),
-                            event->wheel.timestamp, static_cast<KeyMod>(mod));
+        MouseScrolledEvent e(event, static_cast<KeyMod>(mod));
+
+        if (event.wheel.which == SDL_TOUCH_MOUSEID) {
+          e.SetMouseMoved(false);
+        }
         callBack(e);
         return 0;
       }
 
       // * Window Events * //
       case SDL_WINDOWEVENT: {
-        switch (event->window.event) {
+        switch (event.window.event) {
           case SDL_WINDOWEVENT_RESIZED: { // 窗口大小改变
-            WindowResizeEvent e(Vector2<uint32>{static_cast<uint32>(event->window.data1), static_cast<uint32>(event->window.data2)});
+            WindowResizeEvent e(event);
             callBack(e);
             return 0;
           }
           case SDL_WINDOWEVENT_MOVED : { // 窗口移动
-            WindowMovedEvent e(Vector2<uint32>{static_cast<uint32>(event->window.data1), static_cast<uint32>(event->window.data2)});
+            WindowMovedEvent e(event);
             callBack(e);
             return 0;
           }
           case SDL_WINDOWEVENT_FOCUS_LOST: { // 窗口失去焦点
-            WindowFocusEvent e;
+            WindowLostFocusEvent e(event);
             callBack(e);
             return 0;
           }
-          case SDL_WINDOWEVENT_FOCUS_GAINED: { // 窗口获得焦点
-            WindowLostFocusEvent e;
+          case SDL_WINDOWEVENT_FOCUS_GAINED: { // 窗口获得键盘焦点
+            WindowFocusEvent e(event);
             callBack(e);
             return 0;
           }
           case SDL_WINDOWEVENT_CLOSE: { // 窗口关闭
-            WindowCloseEvent e;
+            WindowCloseEvent e(event);
             callBack(e);
             return 0;
           }
           case SDL_WINDOWEVENT_SHOWN: {  // 窗口显示
-            WindowShowEvent e;
+            WindowShowEvent e(event);
             callBack(e);
             return 0;
           }
           case SDL_WINDOWEVENT_HIDDEN: { // 窗口隐藏
-            WindowHideEvent e;
+            WindowHideEvent e(event);
             callBack(e);
             return 0;
           }
           case SDL_WINDOWEVENT_MAXIMIZED: { // 窗口最大化
-            WindowMaximizedEvent e;
+            WindowMaximizedEvent e(event);
             callBack(e);
             return 0;
           }
           case SDL_WINDOWEVENT_MINIMIZED: { // 窗口最小化
-            WindowMinimizedEvent e;
+            WindowMinimizedEvent e(event);
             callBack(e);
             return 0;
-          }
+         }
           case SDL_WINDOWEVENT_ENTER: { // 鼠标窗口进入
-            WindowEnterEvent e;
+            WindowEnterEvent e(event);
             callBack(e);
             return 0;
           }
           case SDL_WINDOWEVENT_LEAVE: { // 鼠标窗口离开
-            WindowLeaveEvent e;
+            WindowLeaveEvent e(event);
             callBack(e);
             return 0;
           }
           case SDL_WINDOWEVENT_EXPOSED: { // 窗口暴露
-            WindowExposedEvent e;
+            WindowExposedEvent e(event);
             callBack(e);
             return 0;
           }
           case SDL_WINDOWEVENT_RESTORED: { // 窗口恢复
-            WindowRestoredEvent e;
+            WindowRestoredEvent e(event);
             callBack(e);
             return 0;
           }
           default: {
             UnKnownEvent e;
             callBack(e);
-            YT_CORE_WARN("未知窗口事件{0} , {1}", event->window.event, event->type);
+            YT_CORE_WARN("未知窗口事件{0} , {1}", event.window.event, type);
             return 0;
           }
         }
         break;
     }
+    // * Controller Events * //
+      case SDL_CONTROLLERDEVICEADDED: {
+        ControllerAddedEvent e;
+        callBack(e);
+        return 0;
+      }
+    case SDL_CONTROLLERDEVICEREMOVED: {
+      ControllerRemovedEvent e;
+      callBack(e);
+      return 0;
+    }
+
     // * Text Input * //
     case SDL_TEXTINPUT: {
-      TextInputEvent e(event->text.text);
+      TextInputEvent e(event);
       callBack(e);
       return 0;
     }
     case SDL_TEXTEDITING: {
-      TextEditingEvent e(event->edit.text, event->edit.start, event->edit.length);
+      TextEditingEvent e(event);
       callBack(e);
       return 0;
     }
     case SDL_CLIPBOARDUPDATE: {
-      YT_CORE_INFO("Clipboard changed");
-      auto text = SDL_GetClipboardText();
-      auto len = SDL_strlen(text);
-      auto text_ = std::string(text, len);
-      ClipboardChangedEvent e(text_, 0, len);
+      ClipboardChangedEvent e(event);
       callBack(e);
       return 0;
     }
     default: {
       UnKnownEvent e;
-      YT_CORE_WARN("未知事件{0}", event->type);
+      YT_CORE_WARN("未知事件{0}", type);
       callBack(e);
       return 0;
     }

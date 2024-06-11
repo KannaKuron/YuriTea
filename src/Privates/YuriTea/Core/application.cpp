@@ -1,5 +1,4 @@
 #include "YuriTea/Core/application.hpp"
-#include "YuriTea/Core/basicstruct.hpp"
 
 namespace YuriTea {
 Scope<Application> Application::m_App = nullptr;
@@ -25,10 +24,9 @@ Application::~Application() {
 
 void Application::OnEvent(Event &e) {
   // 事件处理函数实现
+  YT_CORE_TRACE("{0}", e.ToString());
   EventDispatcher dispatcher(e);
   if( dispatcher.Dispatch<WindowCloseEvent>(YT_BIND_EVENT_FN(Application::OnWindowClose))){
-    YT_CORE_ERROR("WindowCloseEvent {0}",e.ToString());
-    //getsdl2Error();
     YT_CORE_ERROR("The Error is {0}",SDL_GetError());
     return;
   }
@@ -46,6 +44,10 @@ void Application::OnEvent(Event &e) {
 void Application::Run() {
   while (m_Running) {
     // 一直循环
+
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+
     for(const auto& layer : *m_LayerStack)
       layer.get()->OnUpdate();
     m_Window->OnUpdate();
@@ -60,7 +62,8 @@ int32 Application::Close(){
   //循环检查m_AllQuit是否为true 否则一直循环
   YT_CORE_WARN("Application Closeing...");
 
-  m_App.reset();
+  if(m_App != nullptr) m_App.reset();
+
   return 0;
 }
 

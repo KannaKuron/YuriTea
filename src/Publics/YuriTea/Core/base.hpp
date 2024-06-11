@@ -1,5 +1,4 @@
 #pragma once
-
 #include "YuriTea/Core/basicstruct.hpp" 
 
 #ifdef YuriTea_Platform_Windows
@@ -28,8 +27,9 @@
 
 
 #ifdef YuriTea_ENABLE_ASSERTS
-#define YT_ASSERT(x, ...) { if(!(x)) { YT_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
-#define YT_CORE_ASSERT(x, ...) { if(!(x)) { YT_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
+#include <cassert>
+#define YT_ASSERT(x, ...) assert(x && __VA_ARGS__)
+#define YT_CORE_ASSERT(x, ...) assert(x && __VA_ARGS__)
 #else
 #define YT_ASSERT(x, ...)
 #define YT_CORE_ASSERT(x, ...)
