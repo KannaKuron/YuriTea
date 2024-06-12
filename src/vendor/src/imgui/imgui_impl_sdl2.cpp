@@ -472,6 +472,7 @@ bool ImGui_ImplSDL2_YuriTea_ProcessEvent(const YuriTea::Event* event){
   constexpr const uint32 TextInput = EventCategory::EventCategoryTextInput | EventCategory::EventCategoryInput | EventCategory::EventCategoryKeyboard;
   constexpr const uint32 Gamepad = EventCategory::EventCategoryGameController | EventCategory::EventCategoryInput;
   constexpr const uint32 Window = EventCategory::EventCategoryWindow;
+  constexpr const uint32 Display = EventCategory::EventCategoryDisplay;
 
   switch (category) {
   case MouseMove: {
@@ -571,6 +572,13 @@ bool ImGui_ImplSDL2_YuriTea_ProcessEvent(const YuriTea::Event* event){
     }
     return false;
   }
+  case Display: {
+    if (type == EventType::DisplayEvent){
+      bd->WantUpdateMonitors = true;
+      return true;
+    }
+    return false;
+  }
   case Window: {
     if (type == EventType::WindowEnter) {
       auto windowEvent = static_cast<const WindowEnterEvent*>(event);
@@ -599,10 +607,6 @@ bool ImGui_ImplSDL2_YuriTea_ProcessEvent(const YuriTea::Event* event){
   }
   return false;
 }
-
-
-
-
 
 
 static bool ImGui_ImplSDL2_Init(SDL_Window* window, SDL_Renderer* renderer, void* sdl_gl_context)

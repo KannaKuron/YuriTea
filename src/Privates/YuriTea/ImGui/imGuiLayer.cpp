@@ -1,7 +1,4 @@
 #include "YuriTea/ImGui/imGuiLayer.hpp"
-#include "YuriTea/Core/base.hpp"
-#include "YuriTea/Platform/Windows/windowsWindow.hpp"
-#include "imgui/imgui.h"
 
 
 

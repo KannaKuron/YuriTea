@@ -18,12 +18,8 @@ else()
 endif()
 
 
-
 set(CMAKE_CXX_COMPILER clang++)
 set(CMAKE_C_COMPILER clang)
-
-
-
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -51,15 +47,29 @@ add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
 
 # 设定宏定义
 target_compile_definitions(${PROJECT_NAME} PRIVATE YuriTeaEngine)
+if(WIN32)
 target_compile_definitions(${PROJECT_NAME} PRIVATE YuriTea_Platform_Windows)
+# 添加子系统标志
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS")
+endif()
 target_compile_definitions(${PROJECT_NAME} PRIVATE YuriTea_BUILD_DLL)
+target_compile_definitions(${PROJECT_NAME} PRIVATE YuriTea_Graphics_API_OpenGL)
 
 #如果编译模式为Debug，定义 YuriTea_DEBUG 和 YuriTea_ENABLE_ASSERTS
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+
+  message(STATUS "Setting Debug Mode")
+
   target_compile_definitions(${PROJECT_NAME} PRIVATE YuriTea_DEBUG)
   target_compile_definitions(${PROJECT_NAME} PRIVATE YuriTea_ENABLE_ASSERTS)
+else()
+
+  message(STATUS "Setting Release Mode")
+
+  target_compile_definitions(${PROJECT_NAME} PRIVATE YuriTea_RELEASE)
+  target_compile_definitions(${PROJECT_NAME} PRIVATE YuriTea_DISABLE_ASSERTS)
 endif()
-target_compile_definitions(${PROJECT_NAME} PRIVATE YuriTea_Graphics_API_OpenGL)
+
 
 # 设置 include 目录
 target_include_directories(${PROJECT_NAME} PRIVATE 

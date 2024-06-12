@@ -12,7 +12,8 @@
 #ifdef YuriTea_Platform_Windows
 #include <io.h>
 #endif
-
+#include <exception>
+#include <cstdlib>
 #include <array>
 #include <sstream>
 #include <string>

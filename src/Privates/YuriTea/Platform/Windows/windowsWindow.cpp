@@ -1,4 +1,5 @@
 #include "YuriTea/Platform/Windows/windowsWindow.hpp"
+#include "SDL2/SDL_events.h"
 
 namespace YuriTea {
 
@@ -169,17 +170,24 @@ void WindowsWindow::SetEventFilters(){
         break;
     }
     // * Controller Events * //
-      case SDL_CONTROLLERDEVICEADDED: {
-        ControllerAddedEvent e;
-        callBack(e);
-        return 0;
-      }
+    case SDL_CONTROLLERDEVICEADDED: {
+      ControllerAddedEvent e;
+      callBack(e);
+      return 0;
+    }
     case SDL_CONTROLLERDEVICEREMOVED: {
       ControllerRemovedEvent e;
       callBack(e);
       return 0;
     }
 
+
+    //Display Events
+    case SDL_DISPLAYEVENT:{
+      DisplayEvent e(event);
+      callBack(e);
+      return 0;
+    }
     // * Text Input * //
     case SDL_TEXTINPUT: {
       TextInputEvent e(event);

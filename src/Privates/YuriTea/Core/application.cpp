@@ -1,23 +1,27 @@
 #include "YuriTea/Core/application.hpp"
+#include "YuriTea/Events/applicationEvent.hpp"
 
 namespace YuriTea {
 Scope<Application> Application::m_App = nullptr;
 
 Application::Application() {
   m_App.reset(this);
+  m_Windows.resize(1);
   
   // 构造函数实现
   WindowProps props;
-  m_Window = Window::Create(props);
+  m_Windows[0] = Window::Create(props);
   m_LayerStack.reset(new LayerStack());
   m_Running = true;
 
-  m_Window->SetEventCallback(YT_BIND_EVENT_FN(Application::OnEvent));
+  m_Windows[0]->SetEventCallback(YT_BIND_EVENT_FN(Application::OnEvent));
 }
 
 Application::~Application() {
   // 析构函数实现
-  m_Window.reset();
+  for(auto& window : m_Windows){
+    window.reset();
+  }
   m_LayerStack.reset();
 
 }
@@ -30,6 +34,11 @@ void Application::OnEvent(Event &e) {
     YT_CORE_ERROR("The Error is {0}",SDL_GetError());
     return;
   }
+  if( dispatcher.Dispatch<AppTerminateEvent>(YT_BIND_EVENT_FN(Application::OnAppTerminate))){
+    YT_CORE_ERROR("The Error is {0}",SDL_GetError());
+    return;
+  }
+
 
   // 逆序遍历LayerStack ,处理事件 保证先处理Overlay再处理Layer
   for (auto it = m_LayerStack->end(); it != m_LayerStack->begin();) {
@@ -50,7 +59,7 @@ void Application::Run() {
 
     for(const auto& layer : *m_LayerStack)
       layer.get()->OnUpdate();
-    m_Window->OnUpdate();
+    m_Windows[0]->OnUpdate();
   }
 }
 
@@ -69,6 +78,15 @@ int32 Application::Close(){
 
 
 bool Application::OnWindowClose(WindowCloseEvent & e){
+  if(e.GetWindowID() == 1){
+    m_Running = false;
+    return true;
+  }
+  return true;
+}
+
+bool Application::OnAppTerminate(AppTerminateEvent& e) {
+
   m_Running = false;
   return true;
 }

@@ -1,4 +1,5 @@
 #pragma once
+#include "YuriTea/Core/basicstruct.hpp"
 #include "YuriTea/Core/core.hpp"
 #include "YuriTea/Core/layerStack.hpp"
 
@@ -16,7 +17,7 @@ public:
 
   static const Application *Get() { return m_App.get(); }
 
-  Window* GetWindow() const { return m_Window.get(); }
+  Window* GetWindow() const { return m_Windows[0].get(); }
 
   void Run();
   void OnEvent(Event &);
@@ -29,11 +30,12 @@ protected:
     Application();          // 构造函数
 private:
   bool OnWindowClose(WindowCloseEvent &);
+  bool OnAppTerminate(AppTerminateEvent&);
 
 
 private:
   static Scope<Application> m_App;
-  Scope<Window> m_Window;
+  std::vector<Scope<Window>> m_Windows;
   Scope<LayerStack> m_LayerStack;
   bool m_Running = true;
 };

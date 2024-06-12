@@ -43,8 +43,8 @@ public:
 
   std::string ToString() const override {
     std::stringstream ss;
-    ss << "MouseMovedEvent: " << m_Position.x << "," << m_Position.y << "WindowID: " << m_WindowID <<
-    "\nState: " << m_State << "KeyMod: " << m_KeyMod;
+    ss << "MouseMovedEvent: " << m_Position.x << "," << m_Position.y << ",WindowID: " << m_WindowID <<
+    "\nKeyMod: " << m_KeyMod;
 
     return ss.str();
   }
@@ -91,7 +91,7 @@ public:
 
   std::string ToString() const override {
     std::stringstream ss;
-    ss << "MouseScrolledEvent: " << m_Offset.x << "," << m_Offset.y << "WindowID: " << m_WindowID;
+    ss << "MouseScrolledEvent: " << m_Offset.x << "," << m_Offset.y << ",WindowID: " << m_WindowID;
     return ss.str();
   }
 

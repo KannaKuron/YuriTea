@@ -22,6 +22,7 @@ enum class EventType : uint32 {
   AppRender, // app每一次渲染
   
   LocaleChanged, // 语言改变
+
   DisplayEvent = 0x150, // 336 显示事件
   
   
@@ -127,7 +128,8 @@ enum EventCategory : uint32 {
   EventCategoryTextInput = BIT(6),   // BIT(6) = 01000000 文本输入事件
   EventCategoryJoystick = BIT(7),    // BIT(7) = 10000000 手柄事件
   EventCategoryGameController = BIT(8), // BIT(8) = 100000000 游戏控制器事件
-  EventCategoryCustom = BIT(9)       // BIT(8) = 100000000 自定义事件
+  EventCategoryDisplay = BIT(9),       // BIT(8) = 100000000 显示事件
+  EventCategoryCustom = BIT(10)       // BIT(8) = 100000000 自定义事件
 };
 
 #define EVENT_CLASS_TYPE(type)                                                 \

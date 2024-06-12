@@ -293,6 +293,26 @@ private:
   uint32 m_WindowID;
 };
 
+
+class YURITEA_API DisplayEvent : public Event{
+public:
+  DisplayEvent(const SDL_Event& event){}
+  ~DisplayEvent(){}
+
+  std::string ToString() const override{
+    return "DisplayEvent";
+  }
+  
+  EVENT_CLASS_TYPE(EventType::DisplayEvent)
+  EVENT_CLASS_CATEGORY(EventCategory::EventCategoryDisplay)
+
+
+protected:
+
+  
+};
+
+
 class YURITEA_API AppTerminateEvent : public Event { // 事件类 AppTerminateEvent 意思是 App 终止事件
 public:
   AppTerminateEvent() = default;
