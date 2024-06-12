@@ -32,24 +32,48 @@ project(YuriTeaTest LANGUAGES CXX)
 
 set(PUBLICS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/Publics)
 set(DEPENDENCIES_HEADERS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/vendor/include)
+set(source_file_path "${CMAKE_CURRENT_SOURCE_DIR}/SandBox.cpp")
 
-
+#如果是debug模式
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+message(STATUS "Setting Debug Mode")
 set(YURITEA_DLL_PATH "${CMAKE_CURRENT_SOURCE_DIR}\\src\\lib\\Debug")
+else()
+ message(STATUS "Setting Release Mode")
+set(YURITEA_DLL_PATH "${CMAKE_CURRENT_SOURCE_DIR}\\src\\lib\\Release")
+endif()
 
 
-add_executable(${PROJECT_NAME}
-  ./SandBox.cpp
+
+if(WIN32)
+  if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  add_executable(${PROJECT_NAME}
+    ${source_file_path}
+  )
+  else()
+  add_executable(${PROJECT_NAME} WIN32
+    ${source_file_path}
+  )
+  endif()
+else()
+add_executable(${PROJECT_NAME} 
+  ${source_file_path}
 )
+endif()
 
 if(WIN32)
 target_compile_definitions(${PROJECT_NAME} PRIVATE YuriTea_Platform_Windows)
+# 添加子系统标志
+# set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS")
 endif()
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE YuriTeaEngine)
 target_compile_definitions(${PROJECT_NAME} PRIVATE YuriTea_Graphics_API_OpenGL)
 
+
 target_compile_definitions(${PROJECT_NAME}
   PRIVATE $<$<CONFIG:Debug>:YuriTea_DEBUG>
+  PRIVATE $<$<CONFIG:Release>:YuriTea_RELEASE>
   PRIVATE $<$<CONFIG:Debug>:YuriTea_ENABLE_ASSERTS>
 )
 
